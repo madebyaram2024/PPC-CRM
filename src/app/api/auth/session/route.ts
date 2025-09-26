@@ -28,23 +28,17 @@ export async function GET(request: NextRequest) {
       });
 
       if (user) {
-        // For production consistency, if this is an admin email, ensure admin role
-        if (user.email === 'admin@pacificpapercups.com' || user.email === 'admin@pacificcups.com') {
-          // Override role to admin for these specific admin emails
-          return NextResponse.json({
-            id: user.id,
-            email: user.email,
-            name: user.name,
-            role: 'admin', // Override to admin for these specific emails
-          });
-        } else {
-          return NextResponse.json({
-            id: user.id,
-            email: user.email,
-            name: user.name,
-            role: user.role,
-          });
-        }
+        // For database users with admin emails, check if they should have admin role
+        // This handles cases where a real user account exists with admin email but potentially wrong role
+        const isPrimaryAdmin = user.email === 'admin@pacificpapercups.com' || user.email === 'admin@pacificcups.com';
+        const effectiveRole = isPrimaryAdmin ? 'admin' : user.role;
+
+        return NextResponse.json({
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role: effectiveRole,
+        });
       }
     } catch (dbError) {
       console.error('Database error in session check:', dbError);

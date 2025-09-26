@@ -34,11 +34,13 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
           
           // Apply same email-based admin logic client-side for consistency
           let processedUserData = { ...userData };
-          if ((userData.email === 'admin@pacificpapercups.com' || userData.email === 'admin@pacificcups.com') && userData.id === 'admin-user-id') {
+          if (userData.email === 'admin@pacificpapercups.com' || userData.email === 'admin@pacificcups.com') {
             processedUserData.role = 'admin';
+            console.log('User Context: Admin role applied client-side for email:', userData.email);
           }
           
           setUser(processedUserData);
+          console.log('User Context: Final user data set:', processedUserData);
         } else {
           console.log('User Context: Session check failed');
         }
@@ -79,10 +81,17 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   };
 
   const hasPermission = (permission: string): boolean => {
-    if (!user) return false;
+    console.log('hasPermission called with permission:', permission, 'for user:', user);
+    if (!user) {
+      console.log('hasPermission: No user, returning false');
+      return false;
+    }
     
     // Admin has all permissions
-    if (user.role === 'admin') return true;
+    if (user.role === 'admin') {
+      console.log('hasPermission: User is admin, returning true for permission:', permission);
+      return true;
+    }
     
     // Define role-based permissions
     const permissions: Record<string, string[]> = {
@@ -92,8 +101,15 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     };
 
     // Check if user has specific permission
-    if (permissions[user.role]?.includes('*')) return true;
-    return permissions[user.role]?.includes(permission) || false;
+    const userPermissions = permissions[user.role];
+    if (userPermissions?.includes('*')) {
+      console.log('hasPermission: User role has wildcard permissions, returning true');
+      return true;
+    }
+    
+    const hasPerm = userPermissions?.includes(permission) || false;
+    console.log('hasPermission: Checking specific permission result:', hasPerm, 'for role:', user.role, 'permission:', permission);
+    return hasPerm;
   };
 
   return (

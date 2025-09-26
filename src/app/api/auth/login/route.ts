@@ -60,11 +60,15 @@ export async function POST(request: NextRequest) {
       });
 
       if (user && await bcrypt.compare(password, user.password)) {
+        // For admin emails, ensure they get admin role regardless of database role
+        const isPrimaryAdmin = email === 'admin@pacificpapercups.com' || email === 'admin@pacificcups.com';
+        const effectiveRole = isPrimaryAdmin ? 'admin' : user.role;
+
         const response = NextResponse.json({
           id: user.id,
           email: user.email,
           name: user.name,
-          role: user.role,
+          role: effectiveRole,
         });
 
         response.cookies.set('session', user.id, {
@@ -76,7 +80,7 @@ export async function POST(request: NextRequest) {
         return response;
       }
     } catch (dbError) {
-      console.error('Database error, using fallback auth:', dbError);
+      console.error('Database error in login:', dbError);
     }
 
     return NextResponse.json(
