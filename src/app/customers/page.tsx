@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -317,33 +318,36 @@ export default function CustomersPage() {
                   <Label htmlFor="billingAddress" className="text-right">
                     Billing Address
                   </Label>
-                  <Input
+                  <Textarea
                     id="billingAddress"
                     value={formData.billingAddress}
                     onChange={(e) => setFormData({ ...formData, billingAddress: e.target.value })}
                     className="col-span-3"
+                    rows={2}
                   />
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="shippingAddress" className="text-right">
                     Shipping Address
                   </Label>
-                  <Input
+                  <Textarea
                     id="shippingAddress"
                     value={formData.shippingAddress}
                     onChange={(e) => setFormData({ ...formData, shippingAddress: e.target.value })}
                     className="col-span-3"
+                    rows={2}
                   />
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="notes" className="text-right">
                     Notes
                   </Label>
-                  <Input
+                  <Textarea
                     id="notes"
                     value={formData.notes}
                     onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                     className="col-span-3"
+                    rows={3}
                   />
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
