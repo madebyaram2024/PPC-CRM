@@ -7,7 +7,22 @@ export async function PUT(
 ) {
   try {
     const body = await request.json();
-    const { name, email, phone, address, status } = body;
+    const {
+      name,
+      email,
+      phone,
+      address,
+      status,
+      companyName,
+      companyPhone,
+      website,
+      contactName,
+      directNumber,
+      contactEmail,
+      billingAddress,
+      shippingAddress,
+      notes
+    } = body;
 
     const customer = await db.customer.update({
       where: { id: params.id },
@@ -17,6 +32,15 @@ export async function PUT(
         phone,
         address,
         status,
+        companyName,
+        companyPhone,
+        website,
+        contactName,
+        directNumber,
+        contactEmail,
+        billingAddress,
+        shippingAddress,
+        notes,
       },
       include: {
         company: {

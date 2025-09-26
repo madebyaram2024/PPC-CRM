@@ -44,15 +44,26 @@ model Company {
 }
 
 model Customer {
-  id        String   @id @default(cuid())
-  name      String
-  email     String?
-  phone     String?
-  address   String?
-  status    String   @default("prospect") // "customer" or "prospect"
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  
+  id               String   @id @default(cuid())
+  // Legacy fields (keeping for backward compatibility)
+  name             String
+  email            String?
+  phone            String?
+  address          String?
+  // New business fields
+  companyName      String?
+  companyPhone     String?
+  website          String?
+  contactName      String?
+  directNumber     String?
+  contactEmail     String?
+  billingAddress   String?
+  shippingAddress  String?
+  notes            String?
+  status           String   @default("prospect") // "customer" or "prospect"
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
   // Relations
   userId    String
   user      User     @relation(fields: [userId], references: [id])

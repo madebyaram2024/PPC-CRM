@@ -24,6 +24,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Search, Plus, Edit, Trash2, Users, UserPlus } from "lucide-react";
 import { toast } from "sonner";
+import { withRetry } from "@/lib/retry";
 
 interface Customer {
   id: string;
@@ -33,6 +34,15 @@ interface Customer {
   address?: string;
   status: "customer" | "prospect";
   createdAt: Date;
+  companyName?: string;
+  companyPhone?: string;
+  website?: string;
+  contactName?: string;
+  directNumber?: string;
+  contactEmail?: string;
+  billingAddress?: string;
+  shippingAddress?: string;
+  notes?: string;
   company: {
     name: string;
     email?: string;
@@ -55,6 +65,15 @@ export default function CustomersPage() {
     phone: "",
     address: "",
     status: "prospect" as "customer" | "prospect",
+    companyName: "",
+    companyPhone: "",
+    website: "",
+    contactName: "",
+    directNumber: "",
+    contactEmail: "",
+    billingAddress: "",
+    shippingAddress: "",
+    notes: "",
   });
 
   useEffect(() => {
@@ -89,7 +108,12 @@ export default function CustomersPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
+    if (!formData.companyName) {
+      toast.error("Company Name is required");
+      return;
+    }
+
     try {
       const url = editingCustomer 
         ? `/api/customers/${editingCustomer.id}`
@@ -128,6 +152,15 @@ export default function CustomersPage() {
       phone: customer.phone || "",
       address: customer.address || "",
       status: customer.status,
+      companyName: customer.companyName || "",
+      companyPhone: customer.companyPhone || "",
+      website: customer.website || "",
+      contactName: customer.contactName || "",
+      directNumber: customer.directNumber || "",
+      contactEmail: customer.contactEmail || "",
+      billingAddress: customer.billingAddress || "",
+      shippingAddress: customer.shippingAddress || "",
+      notes: customer.notes || "",
     });
     setIsDialogOpen(true);
   };
@@ -163,6 +196,15 @@ export default function CustomersPage() {
       phone: "",
       address: "",
       status: "prospect",
+      companyName: "",
+      companyPhone: "",
+      website: "",
+      contactName: "",
+      directNumber: "",
+      contactEmail: "",
+      billingAddress: "",
+      shippingAddress: "",
+      notes: "",
     });
   };
 
@@ -189,7 +231,7 @@ export default function CustomersPage() {
               Add Customer
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
+          <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
             <form onSubmit={handleSubmit}>
               <DialogHeader>
                 <DialogTitle>
@@ -204,37 +246,103 @@ export default function CustomersPage() {
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="name" className="text-right">
-                    Name *
+                  <Label htmlFor="companyName" className="text-right">
+                    Company Name *
                   </Label>
                   <Input
-                    id="name"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    id="companyName"
+                    value={formData.companyName}
+                    onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
                     className="col-span-3"
                     required
                   />
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="email" className="text-right">
-                    Email
+                  <Label htmlFor="companyPhone" className="text-right">
+                    Company Phone
                   </Label>
                   <Input
-                    id="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    id="companyPhone"
+                    value={formData.companyPhone}
+                    onChange={(e) => setFormData({ ...formData, companyPhone: e.target.value })}
                     className="col-span-3"
                   />
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="phone" className="text-right">
-                    Phone
+                  <Label htmlFor="website" className="text-right">
+                    Website
                   </Label>
                   <Input
-                    id="phone"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    id="website"
+                    value={formData.website}
+                    onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+                    className="col-span-3"
+                  />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="contactName" className="text-right">
+                    Contact Name
+                  </Label>
+                  <Input
+                    id="contactName"
+                    value={formData.contactName}
+                    onChange={(e) => setFormData({ ...formData, contactName: e.target.value })}
+                    className="col-span-3"
+                  />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="directNumber" className="text-right">
+                    Direct Number
+                  </Label>
+                  <Input
+                    id="directNumber"
+                    value={formData.directNumber}
+                    onChange={(e) => setFormData({ ...formData, directNumber: e.target.value })}
+                    className="col-span-3"
+                  />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="contactEmail" className="text-right">
+                    Contact Email
+                  </Label>
+                  <Input
+                    id="contactEmail"
+                    type="email"
+                    value={formData.contactEmail}
+                    onChange={(e) => setFormData({ ...formData, contactEmail: e.target.value })}
+                    className="col-span-3"
+                  />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="billingAddress" className="text-right">
+                    Billing Address
+                  </Label>
+                  <Input
+                    id="billingAddress"
+                    value={formData.billingAddress}
+                    onChange={(e) => setFormData({ ...formData, billingAddress: e.target.value })}
+                    className="col-span-3"
+                  />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="shippingAddress" className="text-right">
+                    Shipping Address
+                  </Label>
+                  <Input
+                    id="shippingAddress"
+                    value={formData.shippingAddress}
+                    onChange={(e) => setFormData({ ...formData, shippingAddress: e.target.value })}
+                    className="col-span-3"
+                  />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="notes" className="text-right">
+                    Notes
+                  </Label>
+                  <Input
+                    id="notes"
+                    value={formData.notes}
+                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                     className="col-span-3"
                   />
                 </div>
@@ -244,7 +352,7 @@ export default function CustomersPage() {
                   </Label>
                   <Select
                     value={formData.status}
-                    onValueChange={(value: "customer" | "prospect") => 
+                    onValueChange={(value: "customer" | "prospect") =>
                       setFormData({ ...formData, status: value })
                     }
                   >
@@ -355,16 +463,27 @@ export default function CustomersPage() {
                       </Badge>
                     </div>
                     <div className="space-y-1 text-sm text-muted-foreground">
-                      {customer.email && (
-                        <p>Email: {customer.email}</p>
+                      {customer.companyName && (
+                        <p>Company: {customer.companyName}</p>
                       )}
-                      {customer.phone && (
-                        <p>Phone: {customer.phone}</p>
+                      {customer.contactName && (
+                        <p>Contact: {customer.contactName}</p>
                       )}
-                      {customer.address && (
-                        <p>Address: {customer.address}</p>
+                      {customer.contactEmail && (
+                        <p>Email: {customer.contactEmail}</p>
                       )}
-                      <p>Company: {customer.company.name}</p>
+                      {customer.companyPhone && (
+                        <p>Phone: {customer.companyPhone}</p>
+                      )}
+                      {customer.directNumber && (
+                        <p>Direct: {customer.directNumber}</p>
+                      )}
+                      {customer.website && (
+                        <p>Website: {customer.website}</p>
+                      )}
+                      {customer.notes && (
+                        <p>Notes: {customer.notes}</p>
+                      )}
                     </div>
                   </div>
                   <div className="flex gap-2">

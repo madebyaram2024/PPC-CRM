@@ -14,6 +14,10 @@ export async function GET(request: NextRequest) {
         { name: { contains: search, mode: "insensitive" } },
         { email: { contains: search, mode: "insensitive" } },
         { phone: { contains: search, mode: "insensitive" } },
+        { companyName: { contains: search, mode: "insensitive" } },
+        { contactName: { contains: search, mode: "insensitive" } },
+        { contactEmail: { contains: search, mode: "insensitive" } },
+        { companyPhone: { contains: search, mode: "insensitive" } },
       ];
     }
     
@@ -24,7 +28,23 @@ export async function GET(request: NextRequest) {
     const customers = await db.customer.findMany({
       where,
       orderBy: { createdAt: "desc" },
-      include: {
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        address: true,
+        status: true,
+        createdAt: true,
+        companyName: true,
+        companyPhone: true,
+        website: true,
+        contactName: true,
+        directNumber: true,
+        contactEmail: true,
+        billingAddress: true,
+        shippingAddress: true,
+        notes: true,
         company: {
           select: { 
             name: true,
@@ -50,7 +70,22 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { name, email, phone, address, status } = body;
+    const {
+      name,
+      email,
+      phone,
+      address,
+      status,
+      companyName,
+      companyPhone,
+      website,
+      contactName,
+      directNumber,
+      contactEmail,
+      billingAddress,
+      shippingAddress,
+      notes
+    } = body;
 
     if (!name) {
       return NextResponse.json(
@@ -71,6 +106,15 @@ export async function POST(request: NextRequest) {
         phone,
         address,
         status: status || "prospect",
+        companyName,
+        companyPhone,
+        website,
+        contactName,
+        directNumber,
+        contactEmail,
+        billingAddress,
+        shippingAddress,
+        notes,
         companyId: defaultCompanyId,
         userId: defaultUserId,
       },
