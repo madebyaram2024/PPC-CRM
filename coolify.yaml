@@ -1,0 +1,86 @@
+# Coolify Configuration for Pacific Paper Cups
+name: pacific-paper-cups
+description: Business Management System for Pacific Paper Cups
+
+# Application Configuration
+app:
+  name: pacific-paper-cups
+  port: 3000
+  dockerfile: Dockerfile
+  
+  # Environment Variables (set these in Coolify dashboard)
+  environment:
+    NODE_ENV: production
+    DATABASE_URL: file:./prod.db
+    NEXTAUTH_URL: ${NEXTAUTH_URL}         # Will be set automatically by Coolify
+    NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}    # Generate a secure secret
+    SMTP_HOST: ${SMTP_HOST}               # Optional: your SMTP server
+    SMTP_PORT: ${SMTP_PORT}               # Optional: SMTP port
+    SMTP_USER: ${SMTP_USER}               # Optional: SMTP username
+    SMTP_PASS: ${SMTP_PASS}               # Optional: SMTP password
+  
+  # Volumes (persistent storage)
+  volumes:
+    - uploads:/app/uploads        # File uploads storage
+    - database:/app              # Database file storage
+  
+  # Health Check
+  health_check:
+    path: /api/health
+    interval: 30s
+    timeout: 10s
+    retries: 3
+  
+  # Resource Limits
+  resources:
+    limits:
+      memory: "1Gi"
+      cpu: "500m"
+    requests:
+      memory: "512Mi"
+      cpu: "250m"
+
+# Database Configuration (SQLite - no external DB needed)
+# Using SQLite file database stored in persistent volume
+# If you want to use PostgreSQL instead, uncomment below and update DATABASE_URL
+# database:
+#   type: postgres
+#   version: "15"
+#   name: pacificcups-db
+#   environment:
+#     POSTGRES_DB: pacificcups
+#     POSTGRES_USER: pacificcups
+#     POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+#   volume:
+#     size: 10Gi
+
+# Domains - Coolify will provide a subdomain automatically
+# domains:
+#   - domain: your-custom-domain.com  # Uncomment and set when you have a domain
+#     path: /
+
+# Build Configuration
+build:
+  dockerfile: Dockerfile
+  context: .
+
+# Deployment Strategy
+deployment:
+  strategy: rolling_update
+  replicas: 1
+
+# Security
+security:
+  read_only_filesystem: false
+  run_as_non_root: true
+  capabilities:
+    drop:
+      - ALL
+    add:
+      - CHOWN
+      - DAC_OVERRIDE
+
+# Monitoring
+monitoring:
+  enabled: true
+  path: /metrics
