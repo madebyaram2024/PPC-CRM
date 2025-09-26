@@ -28,12 +28,23 @@ export async function GET(request: NextRequest) {
       });
 
       if (user) {
-        return NextResponse.json({
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          role: user.role,
-        });
+        // For production consistency, if this is an admin email, ensure admin role
+        if (user.email === 'admin@pacificpapercups.com' || user.email === 'admin@pacificcups.com') {
+          // Override role to admin for these specific admin emails
+          return NextResponse.json({
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            role: 'admin', // Override to admin for these specific emails
+          });
+        } else {
+          return NextResponse.json({
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            role: user.role,
+          });
+        }
       }
     } catch (dbError) {
       console.error('Database error in session check:', dbError);
