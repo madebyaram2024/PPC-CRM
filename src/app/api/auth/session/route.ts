@@ -11,6 +11,7 @@ export async function GET(request: NextRequest) {
 
     // Handle fallback admin user
     if (sessionId === 'admin-user-id') {
+      console.log('Session API: Fallback admin user detected');
       return NextResponse.json({
         id: 'admin-user-id',
         email: 'admin@pacificpapercups.com', // Using the most common email format

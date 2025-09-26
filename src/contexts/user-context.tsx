@@ -30,7 +30,10 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         const response = await fetch('/api/auth/session');
         if (response.ok) {
           const userData = await response.json();
+          console.log('User Context: Session data received:', userData);
           setUser(userData);
+        } else {
+          console.log('User Context: Session check failed');
         }
       } catch (error) {
         console.error('Failed to check session:', error);
