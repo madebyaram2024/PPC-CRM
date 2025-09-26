@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import bcrypt from 'bcryptjs';
 
 export async function POST(request: NextRequest) {
   try {
@@ -24,9 +25,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // For demo purposes, accept any password
-    // In production, you should hash and verify passwords
-    // For now, we'll just check if the user exists
+    // Verify password
+    const isValidPassword = await bcrypt.compare(password, user.password);
+
+    if (!isValidPassword) {
+      return NextResponse.json(
+        { error: 'Invalid credentials' },
+        { status: 401 }
+      );
+    }
 
     // Create session response
     const response = NextResponse.json({

@@ -1,17 +1,25 @@
 import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
 async function main() {
   console.log('Seeding database...');
 
-  // Create demo users
+  // Hash passwords for production use
+  const saltRounds = 12;
+  const adminPassword = await bcrypt.hash('Admin123!', saltRounds);
+  const userPassword = await bcrypt.hash('User123!', saltRounds);
+  const managerPassword = await bcrypt.hash('Manager123!', saltRounds);
+
+  // Create demo users with real passwords
   const adminUser = await prisma.user.upsert({
     where: { email: 'admin@pacificcups.com' },
     update: {},
     create: {
       email: 'admin@pacificcups.com',
       name: 'Admin User',
+      password: adminPassword,
       role: 'admin',
     },
   });
@@ -22,6 +30,7 @@ async function main() {
     create: {
       email: 'user@pacificcups.com',
       name: 'Regular User',
+      password: userPassword,
       role: 'user',
     },
   });
@@ -32,6 +41,7 @@ async function main() {
     create: {
       email: 'manager@pacificcups.com',
       name: 'Manager User',
+      password: managerPassword,
       role: 'manager',
     },
   });
@@ -109,11 +119,11 @@ async function main() {
   });
 
   console.log('Database seeded successfully!');
-  console.log('Demo users created:');
-  console.log('- Admin: admin@pacificcups.com');
-  console.log('- Manager: manager@pacificcups.com');
-  console.log('- User: user@pacificcups.com');
-  console.log('Any password works for demo accounts');
+  console.log('Production users created:');
+  console.log('- Admin: admin@pacificcups.com / Password: Admin123!');
+  console.log('- Manager: manager@pacificcups.com / Password: Manager123!');
+  console.log('- User: user@pacificcups.com / Password: User123!');
+  console.log('IMPORTANT: Change these passwords in production!');
 }
 
 main()
