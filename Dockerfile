@@ -28,9 +28,5 @@ RUN mkdir -p uploads
 # Expose port
 EXPOSE 3000
 
-# Copy initialization script
-COPY init-app.sh ./
-RUN chmod +x init-app.sh
-
-# Start the application with proper initialization
-CMD ["./init-app.sh"]
+# Start the application with database setup
+CMD ["sh", "-c", "npx prisma migrate deploy && npx prisma generate && (npm run db:seed || echo 'Seed failed, continuing...') && npm start"]
