@@ -8,14 +8,16 @@ async function main() {
 
   // Hash passwords for production use
   const saltRounds = 12;
-  const adminPassword = await bcrypt.hash('Admin123!', saltRounds);
-  const userPassword = await bcrypt.hash('User123!', saltRounds);
-  const managerPassword = await bcrypt.hash('Manager123!', saltRounds);
+  const adminPassword = await bcrypt.hash('admin123', saltRounds);
+  const userPassword = await bcrypt.hash('user123', saltRounds);
+  const managerPassword = await bcrypt.hash('manager123', saltRounds);
 
   // Create demo users with real passwords
   const adminUser = await prisma.user.upsert({
     where: { email: 'admin@pacificcups.com' },
-    update: {},
+    update: {
+      password: adminPassword,
+    },
     create: {
       email: 'admin@pacificcups.com',
       name: 'Admin User',
@@ -26,7 +28,9 @@ async function main() {
 
   const regularUser = await prisma.user.upsert({
     where: { email: 'user@pacificcups.com' },
-    update: {},
+    update: {
+      password: userPassword,
+    },
     create: {
       email: 'user@pacificcups.com',
       name: 'Regular User',
@@ -37,7 +41,9 @@ async function main() {
 
   const managerUser = await prisma.user.upsert({
     where: { email: 'manager@pacificcups.com' },
-    update: {},
+    update: {
+      password: managerPassword,
+    },
     create: {
       email: 'manager@pacificcups.com',
       name: 'Manager User',
@@ -85,8 +91,10 @@ async function main() {
   });
 
   // Create demo products
-  const product1 = await prisma.product.create({
-    data: {
+  const product1 = await prisma.product.upsert({
+    where: { sku: 'PPC-8OZ' },
+    update: {},
+    create: {
       name: '8oz Paper Cup',
       description: 'Standard 8oz paper cup with custom logo printing',
       price: 0.15,
@@ -96,8 +104,10 @@ async function main() {
     },
   });
 
-  const product2 = await prisma.product.create({
-    data: {
+  const product2 = await prisma.product.upsert({
+    where: { sku: 'PPC-12OZ' },
+    update: {},
+    create: {
       name: '12oz Paper Cup',
       description: 'Large 12oz paper cup with custom logo printing',
       price: 0.20,
@@ -107,8 +117,10 @@ async function main() {
     },
   });
 
-  const product3 = await prisma.product.create({
-    data: {
+  const product3 = await prisma.product.upsert({
+    where: { sku: 'PPC-LID' },
+    update: {},
+    create: {
       name: 'Paper Cup Lid',
       description: 'Fits 8oz and 12oz paper cups',
       price: 0.05,
@@ -120,9 +132,9 @@ async function main() {
 
   console.log('Database seeded successfully!');
   console.log('Production users created:');
-  console.log('- Admin: admin@pacificcups.com / Password: Admin123!');
-  console.log('- Manager: manager@pacificcups.com / Password: Manager123!');
-  console.log('- User: user@pacificcups.com / Password: User123!');
+  console.log('- Admin: admin@pacificcups.com / Password: admin123');
+  console.log('- Manager: manager@pacificcups.com / Password: manager123');
+  console.log('- User: user@pacificcups.com / Password: user123');
   console.log('IMPORTANT: Change these passwords in production!');
 }
 
