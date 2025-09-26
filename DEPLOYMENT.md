@@ -130,7 +130,7 @@ After deployment, you'll need to set up the database:
 
 3. **Create Admin User**
    The seed script will create an admin user with:
-   - Email: `admin@pacificcups.com`
+   - Email: `admin@pacificcups.com` or `admin@pacificpapercups.com`
    - Password: `admin123` (change immediately)
 
 ### Security Configuration

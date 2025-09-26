@@ -14,10 +14,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Simple admin check for deployment issues
-    if (email === 'admin@pacificcups.com' && password === 'admin123') {
+    if (email === 'admin@pacificpapercups.com' && password === 'admin123') {
       const adminUser = {
         id: 'admin-user-id',
-        email: 'admin@pacificcups.com',
+        email: 'admin@pacificpapercups.com',
         name: 'Admin User',
         role: 'admin'
       };

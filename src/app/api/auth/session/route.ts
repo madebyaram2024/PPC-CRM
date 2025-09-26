@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
     if (sessionId === 'admin-user-id') {
       return NextResponse.json({
         id: 'admin-user-id',
-        email: 'admin@pacificcups.com',
+        email: 'admin@pacificpapercups.com', // Using the most common email format
         name: 'Admin User',
         role: 'admin',
       });

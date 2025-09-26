@@ -14,12 +14,12 @@ async function main() {
 
   // Create demo users with real passwords
   const adminUser = await prisma.user.upsert({
-    where: { email: 'admin@pacificcups.com' },
+    where: { email: 'admin@pacificpapercups.com' },
     update: {
       password: adminPassword,
     },
     create: {
-      email: 'admin@pacificcups.com',
+      email: 'admin@pacificpapercups.com',
       name: 'Admin User',
       password: adminPassword,
       role: 'admin',
@@ -132,7 +132,7 @@ async function main() {
 
   console.log('Database seeded successfully!');
   console.log('Production users created:');
-  console.log('- Admin: admin@pacificcups.com / Password: admin123');
+  console.log('- Admin: admin@pacificpapercups.com / Password: admin123');
   console.log('- Manager: manager@pacificcups.com / Password: manager123');
   console.log('- User: user@pacificcups.com / Password: user123');
   console.log('IMPORTANT: Change these passwords in production!');
