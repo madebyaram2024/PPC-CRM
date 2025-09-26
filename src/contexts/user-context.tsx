@@ -31,7 +31,14 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         if (response.ok) {
           const userData = await response.json();
           console.log('User Context: Session data received:', userData);
-          setUser(userData);
+          
+          // Apply same email-based admin logic client-side for consistency
+          let processedUserData = { ...userData };
+          if ((userData.email === 'admin@pacificpapercups.com' || userData.email === 'admin@pacificcups.com') && userData.id === 'admin-user-id') {
+            processedUserData.role = 'admin';
+          }
+          
+          setUser(processedUserData);
         } else {
           console.log('User Context: Session check failed');
         }
