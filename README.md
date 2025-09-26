@@ -138,4 +138,13 @@ This scaffold includes a comprehensive set of modern web development tools:
 
 ---
 
+## Admin Credentials
+
+For development and initial setup, use the following admin credentials:
+
+- **Email**: `admin@pacificpapercups.com`
+- **Password**: `admin123`
+
+*Note: Change these credentials in production environments for security.*
+
 Built with ❤️ for the developer community. Supercharged by [Z.ai](https://chat.z.ai) 🚀

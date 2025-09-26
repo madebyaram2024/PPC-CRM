@@ -12,9 +12,10 @@ export async function GET(request: NextRequest) {
     // Handle fallback admin user
     if (sessionId === 'admin-user-id') {
       console.log('Session API: Fallback admin user detected');
+      // Return the primary email format
       return NextResponse.json({
         id: 'admin-user-id',
-        email: 'admin@pacificpapercups.com', // Using the most common email format
+        email: 'admin@pacificpapercups.com',
         name: 'Admin User',
         role: 'admin',
       });
