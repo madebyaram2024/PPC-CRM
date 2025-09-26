@@ -88,12 +88,6 @@ export default function LoginPage() {
               {loading ? "Signing in..." : "Sign in"}
             </Button>
           </form>
-          <div className="mt-4 text-center text-sm text-muted-foreground">
-            <p>Demo credentials:</p>
-            <p>Email: admin@pacificcups.com (Admin)</p>
-            <p>Email: user@pacificcups.com (User)</p>
-            <p>Password: Any password works</p>
-          </div>
         </CardContent>
       </Card>
     </div>

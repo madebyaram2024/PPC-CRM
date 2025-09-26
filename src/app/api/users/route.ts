@@ -32,8 +32,19 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    // Check if user is admin
+    const sessionId = request.cookies.get('session')?.value;
+    if (!sessionId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const currentUser = await db.user.findUnique({ where: { id: sessionId } });
+    if (!currentUser || currentUser.role !== 'admin') {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
     const body = await request.json();
-    const { email, name, role } = body;
+    const { email, name, role, password } = body;
 
     if (!email) {
       return NextResponse.json(
