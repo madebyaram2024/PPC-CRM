@@ -43,6 +43,17 @@ export async function GET(request: NextRequest) {
             }
           }
         },
+        lineItems: {
+          include: {
+            product: {
+              select: {
+                name: true,
+                sku: true,
+                customPrinted: true,
+              }
+            }
+          }
+        },
         user: {
           select: {
             name: true,
@@ -81,7 +92,22 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { invoiceId, customPrinted, number } = body;
+    const { invoiceId, customPrinted, number, customerId, notes, lineItems, amount } = body;
+
+    // Validate required fields
+    if (!customerId) {
+      return NextResponse.json(
+        { error: "Customer ID is required" },
+        { status: 400 }
+      );
+    }
+
+    if (!lineItems || lineItems.length === 0) {
+      return NextResponse.json(
+        { error: "At least one line item is required" },
+        { status: 400 }
+      );
+    }
 
     // Get the first company for now
     const company = await db.company.findFirst();
@@ -89,6 +115,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: "Company not found. Please set up company settings first." },
         { status: 400 }
+      );
+    }
+
+    // Verify customer exists
+    const customer = await db.customer.findUnique({
+      where: { id: customerId }
+    });
+
+    if (!customer) {
+      return NextResponse.json(
+        { error: "Customer not found" },
+        { status: 404 }
       );
     }
 
@@ -101,13 +139,10 @@ export async function POST(request: NextRequest) {
       invoice = await db.invoice.findUnique({
         where: { id: invoiceId },
         include: {
-          lineItems: {
-            include: {
-              product: {
-                select: {
-                  customPrinted: true
-                }
-              }
+          customer: {
+            select: {
+              name: true,
+              email: true,
             }
           }
         }
@@ -119,30 +154,52 @@ export async function POST(request: NextRequest) {
           { status: 404 }
         );
       }
-    }
 
-    // If linked to invoice, determine if any products are custom printed
-    let hasCustomPrintedProducts = false;
-    if (invoice) {
-      hasCustomPrintedProducts = invoice.lineItems.some(
-        item => item.product?.customPrinted
-      );
-      
-      // Auto-set customPrinted based on products in invoice
-      if (hasCustomPrintedProducts && customPrinted === undefined) {
-        body.customPrinted = true;
+      // Verify invoice belongs to the same customer
+      if (invoice.customerId !== customerId) {
+        return NextResponse.json(
+          { error: "Invoice does not belong to the selected customer" },
+          { status: 400 }
+        );
       }
     }
 
-    const workOrder = await db.workOrder.create({
-      data: {
-        number: workOrderNumber,
-        customPrinted: body.customPrinted || false,
-        invoiceId: invoiceId || null,
-        companyId: company.id,
-        userId: user.id,
-        status: "pending",
-      },
+    // Create work order with line items in a transaction
+    const workOrder = await db.$transaction(async (tx) => {
+      // Create the work order
+      const newWorkOrder = await tx.workOrder.create({
+        data: {
+          number: workOrderNumber,
+          customPrinted: customPrinted || false,
+          invoiceId: invoiceId || null,
+          companyId: company.id,
+          userId: user.id,
+          status: "pending",
+        }
+      });
+
+      // Create line items
+      const createdLineItems = await Promise.all(
+        lineItems.map((item: any) =>
+          tx.workOrderLineItem.create({
+            data: {
+              workOrderId: newWorkOrder.id,
+              productId: item.productId,
+              quantity: item.quantity,
+              unitPrice: item.unitPrice,
+              totalPrice: item.totalPrice,
+              description: item.description,
+            }
+          })
+        )
+      );
+
+      return { ...newWorkOrder, lineItems: createdLineItems };
+    });
+
+    // Fetch the complete work order with relations
+    const completeWorkOrder = await db.workOrder.findUnique({
+      where: { id: workOrder.id },
       include: {
         invoice: {
           select: {
@@ -155,6 +212,17 @@ export async function POST(request: NextRequest) {
               }
             }
           }
+        },
+        lineItems: {
+          include: {
+            product: {
+              select: {
+                name: true,
+                sku: true,
+                customPrinted: true,
+              }
+            }
+          }
         }
       }
     });
@@ -164,16 +232,16 @@ export async function POST(request: NextRequest) {
       await db.activity.create({
         data: {
           type: "work_order_created",
-          description: `Created work order ${workOrderNumber}${invoiceId ? ` for invoice ${invoice?.number}` : ''}`,
+          description: `Created work order ${workOrderNumber}${invoiceId ? ` for invoice ${invoice?.number}` : ''} for customer ${customer.name}`,
           userId: user.id,
-          invoiceId: invoiceId || null,
+          customerId: customerId,
         }
       });
     } catch (activityError) {
       console.error("Failed to create activity:", activityError);
     }
 
-    return NextResponse.json(workOrder, { status: 201 });
+    return NextResponse.json(completeWorkOrder, { status: 201 });
   } catch (error) {
     console.error("Work Orders POST error:", error);
     return NextResponse.json(

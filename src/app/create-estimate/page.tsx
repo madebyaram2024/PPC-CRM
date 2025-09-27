@@ -148,6 +148,7 @@ export default function CreateEstimatePage() {
       return;
     }
     setCurrentStep("preview");
+    setIsDialogOpen(true);
   };
 
   const handleCreateEstimate = async () => {

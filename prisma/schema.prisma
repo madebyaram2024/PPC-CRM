@@ -89,7 +89,8 @@ model Product {
   updatedAt     DateTime @updatedAt
   
   // Relations
-  lineItems     LineItem[]
+  lineItems           LineItem[]
+  workOrderLineItems  WorkOrderLineItem[]
 }
 
 model Invoice {
@@ -185,4 +186,20 @@ model WorkOrder {
   
   // File uploads
   documents WorkOrderDocument[]
+  lineItems WorkOrderLineItem[]
+}
+
+model WorkOrderLineItem {
+  id          String   @id @default(cuid())
+  quantity    Int
+  unitPrice   Float
+  totalPrice  Float
+  description String?
+  createdAt   DateTime @default(now())
+
+  // Relations
+  workOrderId String
+  workOrder   WorkOrder @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+  productId   String?
+  product     Product? @relation(fields: [productId], references: [id])
 }

@@ -148,6 +148,7 @@ export default function CreateInvoicePage() {
       return;
     }
     setCurrentStep("preview");
+    setIsDialogOpen(true);
   };
 
   const handleCreateInvoice = async () => {
