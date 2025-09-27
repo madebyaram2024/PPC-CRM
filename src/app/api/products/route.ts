@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, description, price, sku, category } = body;
+    const { name, description, price, sku, category, customPrinted } = body;
 
     if (!name || !price) {
       return NextResponse.json(
@@ -86,6 +86,7 @@ export async function POST(request: NextRequest) {
         price: parseFloat(price),
         sku,
         category,
+        customPrinted: customPrinted || false,
         isActive: true,
       }
     });

@@ -23,9 +23,11 @@ model User {
   updatedAt DateTime @updatedAt
   
   // Relations
-  customers Customer[]
-  invoices  Invoice[]
-  activities Activity[]
+  customers          Customer[]
+  invoices           Invoice[]
+  activities         Activity[]
+  workOrders         WorkOrder[]
+  workOrderDocuments WorkOrderDocument[]
 }
 
 model Company {
@@ -41,6 +43,7 @@ model Company {
   // Relations
   customers   Customer[]
   invoices    Invoice[]
+  workOrders  WorkOrder[]
 }
 
 model Customer {
@@ -74,18 +77,19 @@ model Customer {
 }
 
 model Product {
-  id          String   @id @default(cuid())
-  name        String
-  description String?
-  price       Float
-  sku         String?  @unique
-  category    String?
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            String   @id @default(cuid())
+  name          String
+  description   String?
+  price         Float
+  sku           String?  @unique
+  category      String?
+  isActive      Boolean  @default(true)
+  customPrinted Boolean  @default(false) // New field for custom printed products
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
   
   // Relations
-  lineItems   LineItem[]
+  lineItems     LineItem[]
 }
 
 model Invoice {
@@ -106,6 +110,23 @@ model Invoice {
   user        User     @relation(fields: [userId], references: [id])
   lineItems   LineItem[]
   activities  Activity[]
+  workOrders  WorkOrder[]
+}
+
+model WorkOrderDocument {
+  id          String   @id @default(cuid())
+  filename    String
+  originalName String
+  path        String
+  mimeType    String
+  size        Int
+  createdAt   DateTime @default(now())
+  
+  // Relations
+  workOrderId String
+  workOrder   WorkOrder @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
 }
 
 model LineItem {
@@ -136,4 +157,32 @@ model Activity {
   customer    Customer? @relation(fields: [customerId], references: [id])
   invoiceId   String?
   invoice     Invoice?  @relation(fields: [invoiceId], references: [id])
+}
+
+model WorkOrder {
+  id            String   @id @default(cuid())
+  number        String   @unique
+  status        String   @default("pending") // "pending", "in_progress", "completed"
+  customPrinted Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  // Status tracking
+  printedCompleted    Boolean @default(false)
+  printedPhoto        String?
+  productionCompleted Boolean @default(false)
+  productionPhoto     String?
+  shippedCompleted    Boolean @default(false)
+  shippedPhoto        String?
+  
+  // Relations
+  invoiceId String?
+  invoice   Invoice? @relation(fields: [invoiceId], references: [id])
+  companyId String
+  company   Company  @relation(fields: [companyId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  
+  // File uploads
+  documents WorkOrderDocument[]
 }

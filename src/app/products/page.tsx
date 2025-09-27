@@ -45,6 +45,7 @@ interface Product {
   sku?: string;
   category?: string;
   isActive: boolean;
+  customPrinted: boolean;
   createdAt: Date;
 }
 
@@ -62,6 +63,7 @@ export default function ProductsPage() {
     price: "",
     sku: "",
     category: "",
+    customPrinted: false,
     isActive: true,
   });
 
@@ -277,6 +279,23 @@ export default function ProductsPage() {
                     rows={3}
                   />
                 </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="customPrinted" className="text-right">
+                    Custom Printed
+                  </Label>
+                  <div className="col-span-3 flex items-center space-x-2">
+                    <Switch
+                      id="customPrinted"
+                      checked={formData.customPrinted}
+                      onCheckedChange={(checked) => 
+                        setFormData({ ...formData, customPrinted: checked })
+                      }
+                    />
+                    <span className="text-sm text-muted-foreground">
+                      {formData.customPrinted ? "Custom printed product" : "Regular product"}
+                    </span>
+                  </div>
+                </div>
                 {editingProduct && (
                   <div className="grid grid-cols-4 items-center gap-4">
                     <Label htmlFor="isActive" className="text-right">
@@ -408,6 +427,11 @@ export default function ProductsPage() {
                       {product.category && (
                         <Badge variant="outline">
                           {product.category}
+                        </Badge>
+                      )}
+                      {product.customPrinted && (
+                        <Badge variant="default" className="bg-purple-100 text-purple-800 border-purple-200">
+                          Custom Printed
                         </Badge>
                       )}
                     </div>
