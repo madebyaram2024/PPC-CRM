@@ -65,11 +65,36 @@ export function NavigationSidebar() {
   const pathname = usePathname();
   const { user, loading, hasPermission } = useUser();
 
+  // Show loading state while user is being checked
+  if (loading) {
+    return (
+      <div className="flex h-full w-64 flex-col bg-card border-r">
+        <div className="flex h-16 items-center px-6 border-b">
+          <div className="flex items-center space-x-2">
+            <div className="relative w-8 h-8">
+              <img
+                src="/logo.svg"
+                alt="Logo"
+                className="w-full h-full object-contain"
+              />
+            </div>
+            <span className="text-lg font-semibold">Pacific Paper Cups</span>
+          </div>
+        </div>
+        <div className="flex-1 px-3 py-4 flex items-center justify-center">
+          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't show navigation if no user (user will be redirected by AuthGuard)
+  if (!user) {
+    return null;
+  }
+
   // Filter navigation items based on user permissions
   const filteredNavigation = navigation.filter((item) => {
-    if (loading) return false;
-    if (!user) return false;
-    
     // Admin-only items
     if (item.adminOnly && user.role !== 'admin') {
       return false;

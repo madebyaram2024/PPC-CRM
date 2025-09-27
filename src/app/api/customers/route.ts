@@ -1,8 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { getCurrentSessionUser } from "@/lib/auth";
 
 export async function GET(request: NextRequest) {
   try {
+    // Check authentication
+    const user = await getCurrentSessionUser();
+    if (!user) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const search = searchParams.get("search") || "";
     const status = searchParams.get("status") || "";
@@ -69,6 +76,12 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    // Check authentication
+    const user = await getCurrentSessionUser();
+    if (!user) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+    }
+
     const body = await request.json();
     const {
       name,
@@ -94,10 +107,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // For now, use a default company ID and user ID
-    // In a real app, these would come from authentication
-    const defaultCompanyId = "default-company-id";
-    const defaultUserId = "default-user-id";
+    // Get the first company for now (could be improved to use user's company)
+    const company = await db.company.findFirst();
+    const companyId = company?.id || "default-company";
 
     const customer = await db.customer.create({
       data: {
@@ -115,8 +127,8 @@ export async function POST(request: NextRequest) {
         billingAddress,
         shippingAddress,
         notes,
-        companyId: defaultCompanyId,
-        userId: defaultUserId,
+        companyId: companyId,
+        userId: user.id,
       },
       include: {
         company: {
@@ -132,14 +144,19 @@ export async function POST(request: NextRequest) {
     });
 
     // Create activity record
-    await db.activity.create({
-      data: {
-        type: "customer_created",
-        description: `Created new ${status || "prospect"}`,
-        userId: defaultUserId,
-        customerId: customer.id,
-      }
-    });
+    try {
+      await db.activity.create({
+        data: {
+          type: "customer_created",
+          description: `Created new ${status || "prospect"}`,
+          userId: user.id,
+          customerId: customer.id,
+        }
+      });
+    } catch (activityError) {
+      // Log but don't fail if activity creation fails
+      console.error("Failed to create activity:", activityError);
+    }
 
     return NextResponse.json(customer, { status: 201 });
   } catch (error) {

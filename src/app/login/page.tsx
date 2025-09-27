@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,8 +13,16 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const { login } = useUser();
+  const { user, login, loading: userLoading } = useUser();
   const router = useRouter();
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user && !userLoading) {
+      console.log('Login: User already logged in, redirecting to dashboard');
+      router.push('/');
+    }
+  }, [user, userLoading, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,6 +43,15 @@ export default function LoginPage() {
       setLoading(false);
     }
   };
+
+  // Show loading if checking user authentication
+  if (userLoading || user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">

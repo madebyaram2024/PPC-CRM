@@ -3,10 +3,9 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "@/components/theme-provider";
-import { NavigationSidebar } from "@/components/navigation-sidebar";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { UserProvider } from "@/contexts/user-context";
-import { UserMenu } from "@/components/user-menu";
+import { AuthGuard } from "@/components/auth-guard";
+import { AppLayout } from "@/components/app-layout";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -47,16 +46,11 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <UserProvider>
-            <div className="flex h-screen">
-              <NavigationSidebar />
-              <main className="flex-1 overflow-auto">
-                <div className="absolute top-4 right-4 z-50 flex items-center gap-2">
-                  <UserMenu />
-                  <ThemeToggle />
-                </div>
+            <AuthGuard>
+              <AppLayout>
                 {children}
-              </main>
-            </div>
+              </AppLayout>
+            </AuthGuard>
           </UserProvider>
           <Toaster />
         </ThemeProvider>

@@ -1,11 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { getCurrentSessionUser } from "@/lib/auth";
 
 export async function GET(request: NextRequest) {
   try {
-    const sessionId = request.cookies.get('session')?.value;
-    if (!sessionId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    // Check authentication
+    const user = await getCurrentSessionUser();
+    if (!user) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+    }
+
+    // Check if user is admin
+    if (user.role !== 'admin') {
+      return NextResponse.json({ error: 'Admin privileges required' }, { status: 403 });
     }
 
     const users = await db.user.findMany({
@@ -37,15 +44,15 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    // Check if user is admin
-    const sessionId = request.cookies.get('session')?.value;
-    if (!sessionId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    // Check authentication
+    const user = await getCurrentSessionUser();
+    if (!user) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
-    const currentUser = await db.user.findUnique({ where: { id: sessionId } });
-    if (!currentUser || currentUser.role !== 'admin') {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    // Check if user is admin
+    if (user.role !== 'admin') {
+      return NextResponse.json({ error: 'Admin privileges required' }, { status: 403 });
     }
 
     const body = await request.json();

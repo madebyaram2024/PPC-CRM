@@ -15,6 +15,14 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Check if user has admin privileges for reading settings
+    if (user.role !== 'admin') {
+      return NextResponse.json(
+        { error: 'Admin privileges required' },
+        { status: 403 }
+      );
+    }
+
     // Get the company settings (there's typically one default company)
     const company = await db.company.findFirst({
       select: {

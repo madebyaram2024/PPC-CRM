@@ -31,16 +31,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         if (response.ok) {
           const userData = await response.json();
           console.log('User Context: Session data received:', userData);
-          
-          // Apply same email-based admin logic client-side for consistency
-          let processedUserData = { ...userData };
-          if (userData.email === 'admin@pacificpapercups.com' || userData.email === 'admin@pacificcups.com') {
-            processedUserData.role = 'admin';
-            console.log('User Context: Admin role applied client-side for email:', userData.email);
-          }
-          
-          setUser(processedUserData);
-          console.log('User Context: Final user data set:', processedUserData);
+          setUser(userData);
+          console.log('User Context: User data set:', userData);
         } else {
           console.log('User Context: Session check failed');
         }
@@ -76,8 +68,12 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
   const logout = () => {
     setUser(null);
-    // Clear session cookie
-    fetch('/api/auth/logout', { method: 'POST' }).catch(console.error);
+    // Clear session cookie and redirect to login
+    fetch('/api/auth/logout', { method: 'POST' })
+      .then(() => {
+        window.location.href = '/login';
+      })
+      .catch(console.error);
   };
 
   const hasPermission = (permission: string): boolean => {
