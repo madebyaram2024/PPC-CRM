@@ -48,7 +48,7 @@ export default function CreateWorkOrderPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
-  const [selectedInvoice, setSelectedInvoice] = useState<string>("");
+  const [selectedInvoice, setSelectedInvoice] = useState<string>("none");
   const [customPrinted, setCustomPrinted] = useState(false);
   const [workOrderNumber, setWorkOrderNumber] = useState("");
   const [hasCustomPrintedProducts, setHasCustomPrintedProducts] = useState(false);
@@ -65,7 +65,7 @@ export default function CreateWorkOrderPage() {
 
   useEffect(() => {
     // Check if selected invoice has custom printed products
-    if (selectedInvoice) {
+    if (selectedInvoice && selectedInvoice !== "none") {
       const invoice = invoices.find(inv => inv.id === selectedInvoice);
       if (invoice) {
         const hasCustomPrinted = invoice.lineItems.some(
@@ -119,7 +119,7 @@ export default function CreateWorkOrderPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           number: workOrderNumber,
-          invoiceId: selectedInvoice || null,
+          invoiceId: (selectedInvoice && selectedInvoice !== "none") ? selectedInvoice : null,
           customPrinted: customPrinted,
         }),
       });
@@ -149,7 +149,7 @@ export default function CreateWorkOrderPage() {
 
   if (!user) return null;
 
-  const selectedInvoiceData = invoices.find(inv => inv.id === selectedInvoice);
+  const selectedInvoiceData = invoices.find(inv => inv.id === selectedInvoice && selectedInvoice !== "none");
 
   return (
     <div className="p-6 space-y-6">
@@ -200,7 +200,7 @@ export default function CreateWorkOrderPage() {
                     <SelectValue placeholder="Select an invoice or leave blank for standalone work order" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">No invoice (standalone work order)</SelectItem>
+                    <SelectItem value="none">No invoice (standalone work order)</SelectItem>
                     {invoices.map((invoice) => (
                       <SelectItem key={invoice.id} value={invoice.id}>
                         {invoice.number} - {invoice.customer.name}
