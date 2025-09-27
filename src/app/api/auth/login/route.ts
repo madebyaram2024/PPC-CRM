@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import bcrypt from 'bcryptjs';
+import { isAdminEmail } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,30 +15,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Robust fallback admin check for deployment consistency
-    if (email === 'admin@pacificpapercups.com' && password === 'admin123') {
+    if (isAdminEmail(email) && password === 'admin123') {
       const adminUser = {
         id: 'admin-user-id',
-        email: 'admin@pacificpapercups.com',
-        name: 'Admin User',
-        role: 'admin'
-      };
-
-      console.log('Login: Admin fallback authentication triggered for', email);
-      const response = NextResponse.json(adminUser);
-      response.cookies.set('session', adminUser.id, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 60 * 60 * 24 * 7, // 7 days
-      });
-      return response;
-    }
-    
-    // Also support the old email for consistency
-    if (email === 'admin@pacificcups.com' && password === 'admin123') {
-      const adminUser = {
-        id: 'admin-user-id',
-        email: 'admin@pacificcups.com',
+        email: email, // Use the provided email
         name: 'Admin User',
         role: 'admin'
       };
@@ -61,8 +42,7 @@ export async function POST(request: NextRequest) {
 
       if (user && await bcrypt.compare(password, user.password)) {
         // For admin emails, ensure they get admin role regardless of database role
-        const isPrimaryAdmin = email === 'admin@pacificpapercups.com' || email === 'admin@pacificcups.com';
-        const effectiveRole = isPrimaryAdmin ? 'admin' : user.role;
+        const effectiveRole = isAdminEmail(email) ? 'admin' : user.role;
 
         const response = NextResponse.json({
           id: user.id,
@@ -81,6 +61,24 @@ export async function POST(request: NextRequest) {
       }
     } catch (dbError) {
       console.error('Database error in login:', dbError);
+      // If DB fails, we still want to allow admin fallback
+      if (isAdminEmail(email) && password === 'admin123') {
+        const adminUser = {
+          id: 'admin-user-id',
+          email: email,
+          name: 'Admin User',
+          role: 'admin'
+        };
+        console.log('Login: Admin fallback authentication triggered after DB error for', email);
+        const response = NextResponse.json(adminUser);
+        response.cookies.set('session', adminUser.id, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'lax',
+          maxAge: 60 * 60 * 24 * 7, // 7 days
+        });
+        return response;
+      }
     }
 
     return NextResponse.json(
