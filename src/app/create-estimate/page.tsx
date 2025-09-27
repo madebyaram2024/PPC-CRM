@@ -147,8 +147,7 @@ export default function CreateEstimatePage() {
       toast.error("Please add at least one product");
       return;
     }
-    setCurrentStep("preview");
-    setIsDialogOpen(true);
+    handleCreateEstimate();
   };
 
   const handleCreateEstimate = async () => {
@@ -174,8 +173,7 @@ export default function CreateEstimatePage() {
       if (!response.ok) throw new Error("Failed to create estimate");
 
       toast.success("Estimate created successfully");
-      setIsDialogOpen(false);
-      resetForm();
+      router.push("/documents");
     } catch (error) {
       toast.error("Failed to create estimate");
     }
@@ -421,8 +419,8 @@ export default function CreateEstimatePage() {
             <Button variant="outline" onClick={() => window.history.back()}>
               Cancel
             </Button>
-            <Button onClick={handleFormSubmit}>
-              Preview Estimate
+            <Button onClick={handleCreateEstimate}>
+              Create Estimate
             </Button>
           </div>
         </CardContent>

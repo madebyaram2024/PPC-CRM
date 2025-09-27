@@ -147,8 +147,7 @@ export default function CreateInvoicePage() {
       toast.error("Please add at least one product");
       return;
     }
-    setCurrentStep("preview");
-    setIsDialogOpen(true);
+    handleCreateInvoice();
   };
 
   const handleCreateInvoice = async () => {
@@ -174,8 +173,7 @@ export default function CreateInvoicePage() {
       if (!response.ok) throw new Error("Failed to create invoice");
 
       toast.success("Invoice created successfully");
-      setIsDialogOpen(false);
-      resetForm();
+      router.push("/invoices");
     } catch (error) {
       toast.error("Failed to create invoice");
     }
@@ -421,8 +419,8 @@ export default function CreateInvoicePage() {
             <Button variant="outline" onClick={() => window.history.back()}>
               Cancel
             </Button>
-            <Button onClick={handleFormSubmit}>
-              Preview Invoice
+            <Button onClick={handleCreateInvoice}>
+              Create Invoice
             </Button>
           </div>
         </CardContent>

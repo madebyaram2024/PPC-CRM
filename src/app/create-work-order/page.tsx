@@ -225,10 +225,6 @@ export default function CreateWorkOrderPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!workOrderNumber.trim()) {
-      toast.error("Work order number is required");
-      return;
-    }
 
     if (formData.lineItems.length === 0) {
       toast.error("Please add at least one product");
@@ -332,14 +328,10 @@ export default function CreateWorkOrderPage() {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="workOrderNumber">Work Order Number *</Label>
-                  <Input
-                    id="workOrderNumber"
-                    value={workOrderNumber}
-                    onChange={(e) => setWorkOrderNumber(e.target.value)}
-                    placeholder="Enter work order number"
-                    required
-                  />
+                  <Label>Work Order Number</Label>
+                  <div className="p-2 bg-muted rounded-md text-sm text-muted-foreground">
+                    Auto-generated: {workOrderNumber}
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="customerId">Customer *</Label>

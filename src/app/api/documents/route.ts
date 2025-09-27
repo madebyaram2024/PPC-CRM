@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { getCurrentSessionUser } from "@/lib/auth";
 
 export async function GET(request: NextRequest) {
   try {
@@ -33,6 +34,12 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    // Check authentication
+    const user = await getCurrentSessionUser();
+    if (!user) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+    }
+
     const body = await request.json();
     const { customerId, amount, dueDate, type, notes, lineItems } = body;
 
@@ -43,12 +50,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Get the first company
+    const company = await db.company.findFirst();
+    if (!company) {
+      return NextResponse.json(
+        { error: "Company not found. Please set up company settings first." },
+        { status: 400 }
+      );
+    }
+
     // Generate invoice number
     const invoiceNumber = `${type === "invoice" ? "INV" : "EST"}-${Date.now()}`;
-
-    // For now, use default company and user IDs
-    const defaultCompanyId = "default-company-id";
-    const defaultUserId = "default-user-id";
 
     const document = await db.invoice.create({
       data: {
@@ -57,8 +69,8 @@ export async function POST(request: NextRequest) {
         dueDate: new Date(dueDate),
         status: "pending",
         customerId,
-        companyId: defaultCompanyId,
-        userId: defaultUserId,
+        companyId: company.id,
+        userId: user.id,
       },
       include: {
         customer: {
@@ -95,7 +107,7 @@ export async function POST(request: NextRequest) {
       data: {
         type: "invoice_created",
         description: `Created ${type} for ${document.customer.name}`,
-        userId: defaultUserId,
+        userId: user.id,
         customerId,
         invoiceId: document.id,
       }
