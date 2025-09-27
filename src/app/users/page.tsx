@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useUser } from "@/contexts/user-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -49,6 +51,8 @@ interface User {
 }
 
 export default function UsersPage() {
+  const router = useRouter();
+  const { user, loading: userLoading, hasPermission } = useUser();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -58,9 +62,31 @@ export default function UsersPage() {
     role: "user",
   });
 
+  // Authentication check
   useEffect(() => {
-    fetchUsers();
-  }, []);
+    if (!userLoading) {
+      if (!user) {
+        console.log('Users: No user found, redirecting to login');
+        router.push('/login');
+        return;
+      }
+      
+      if (user.role !== 'admin') {
+        console.log('Users: User is not admin, role:', user.role);
+        toast.error('Access denied. Admin privileges required.');
+        router.push('/');
+        return;
+      }
+      
+      console.log('Users: Admin user confirmed, loading page');
+    }
+  }, [user, userLoading, router]);
+
+  useEffect(() => {
+    if (user && user.role === 'admin') {
+      fetchUsers();
+    }
+  }, [user]);
 
   const fetchUsers = async () => {
     try {
@@ -159,6 +185,20 @@ export default function UsersPage() {
     }
     return "U";
   };
+
+  // Show loading while checking authentication or fetching data
+  if (userLoading || loading) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  // Show nothing if user check is still pending or user doesn't have access
+  if (!user || user.role !== 'admin') {
+    return null;
+  }
 
   return (
     <div className="p-6 space-y-6">

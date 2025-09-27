@@ -9,10 +9,9 @@ async function main() {
   // Hash passwords for production use
   const saltRounds = 12;
   const adminPassword = await bcrypt.hash('admin123', saltRounds);
-  const userPassword = await bcrypt.hash('user123', saltRounds);
-  const managerPassword = await bcrypt.hash('manager123', saltRounds);
+  const defaultUserPassword = await bcrypt.hash('default123', saltRounds);
 
-  // Create demo users with real passwords
+  // Create admin user
   const adminUser = await prisma.user.upsert({
     where: { email: 'admin@pacificpapercups.com' },
     update: {
@@ -20,48 +19,67 @@ async function main() {
     },
     create: {
       email: 'admin@pacificpapercups.com',
-      name: 'Admin User',
+      name: 'Admin',
       password: adminPassword,
       role: 'admin',
     },
   });
 
-  const regularUser = await prisma.user.upsert({
-    where: { email: 'user@pacificcups.com' },
+  // Create the three specified users: Vick, Art, Lilit
+  const vickUser = await prisma.user.upsert({
+    where: { email: 'vick@pacificpapercups.com' },
     update: {
-      password: userPassword,
+      password: defaultUserPassword,
     },
     create: {
-      email: 'user@pacificcups.com',
-      name: 'Regular User',
-      password: userPassword,
+      email: 'vick@pacificpapercups.com',
+      name: 'Vick',
+      password: defaultUserPassword,
       role: 'user',
     },
   });
 
-  const managerUser = await prisma.user.upsert({
-    where: { email: 'manager@pacificcups.com' },
+  const artUser = await prisma.user.upsert({
+    where: { email: 'art@pacificpapercups.com' },
     update: {
-      password: managerPassword,
+      password: defaultUserPassword,
     },
     create: {
-      email: 'manager@pacificcups.com',
-      name: 'Manager User',
-      password: managerPassword,
-      role: 'manager',
+      email: 'art@pacificpapercups.com',
+      name: 'Art',
+      password: defaultUserPassword,
+      role: 'user',
     },
   });
 
-  // Create demo company
+  const lilitUser = await prisma.user.upsert({
+    where: { email: 'lilit@pacificpapercups.com' },
+    update: {
+      password: defaultUserPassword,
+    },
+    create: {
+      email: 'lilit@pacificpapercups.com',
+      name: 'Lilit',
+      password: defaultUserPassword,
+      role: 'user',
+    },
+  });
+
+  // Create demo company with hardcoded settings
   const company = await prisma.company.upsert({
     where: { id: 'default-company' },
-    update: {},
+    update: {
+      name: 'Pacific Paper Cups',
+      phone: '+1-555-0123',
+      logo: '/logo.svg', // Path to logo, can be updated to actual logo URL
+    },
     create: {
       id: 'default-company',
       name: 'Pacific Paper Cups',
       email: 'info@pacificcups.com',
-      phone: '+1 (555) 123-4567',
-      address: '123 Business Ave, Suite 100, Business City, BC 12345',
+      phone: '+1-555-0123',
+      address: '123 Business Street, City, State 12345',
+      logo: '/logo.svg', // Path to logo, can be updated to actual logo URL
     },
   });
 
@@ -85,7 +103,7 @@ async function main() {
       phone: '+1 (555) 345-6789',
       address: '789 Coffee Lane, Brew City, BC 90123',
       status: 'prospect',
-      userId: regularUser.id,
+      userId: vickUser.id, // Assign to Vick
       companyId: company.id,
     },
   });
@@ -133,9 +151,10 @@ async function main() {
   console.log('Database seeded successfully!');
   console.log('Production users created:');
   console.log('- Admin: admin@pacificpapercups.com / Password: admin123');
-  console.log('- Manager: manager@pacificcups.com / Password: manager123');
-  console.log('- User: user@pacificcups.com / Password: user123');
-  console.log('IMPORTANT: Change these passwords in production!');
+  console.log('- Vick: vick@pacificpapercups.com / Password: default123');
+  console.log('- Art: art@pacificpapercups.com / Password: default123');
+  console.log('- Lilit: lilit@pacificcups.com / Password: default123');
+  console.log('IMPORTANT: Users should change default passwords after first login!');
 }
 
 main()

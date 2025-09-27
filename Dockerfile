@@ -28,5 +28,11 @@ RUN mkdir -p uploads
 # Expose port
 EXPOSE 3000
 
+# Set production environment variables to handle cookies properly
+ENV NODE_ENV=production
+# For proxy compatibility, use simple cookie settings
+ENV USE_SECURE_COOKIES=false
+ENV DISABLE_SECURE_COOKIES=true
+
 # Start the application with database setup
-CMD ["sh", "-c", "npx prisma migrate deploy && npx prisma generate && (npm run db:seed || echo 'Seed failed, continuing...') && npm start"]
+CMD ["/bin/sh", "-c", "npx prisma migrate deploy && npx prisma generate && (npm run db:seed || echo 'Seed failed, continuing...') && npm start"]

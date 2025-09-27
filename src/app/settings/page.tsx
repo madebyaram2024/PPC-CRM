@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useUser } from "@/contexts/user-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -30,6 +32,8 @@ interface CompanyData {
 }
 
 export default function SettingsPage() {
+  const router = useRouter();
+  const { user, loading: userLoading, hasPermission } = useUser();
   const [company, setCompany] = useState<CompanyData | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -42,9 +46,31 @@ export default function SettingsPage() {
     logo: "",
   });
 
+  // Authentication check
   useEffect(() => {
-    fetchCompanyData();
-  }, []);
+    if (!userLoading) {
+      if (!user) {
+        console.log('Settings: No user found, redirecting to login');
+        router.push('/login');
+        return;
+      }
+      
+      if (user.role !== 'admin') {
+        console.log('Settings: User is not admin, role:', user.role);
+        toast.error('Access denied. Admin privileges required.');
+        router.push('/');
+        return;
+      }
+      
+      console.log('Settings: Admin user confirmed, loading page');
+    }
+  }, [user, userLoading, router]);
+
+  useEffect(() => {
+    if (user && user.role === 'admin') {
+      fetchCompanyData();
+    }
+  }, [user]);
 
   const fetchCompanyData = async () => {
     try {
@@ -122,12 +148,17 @@ export default function SettingsPage() {
     setFormData({ ...formData, logo: "" });
   };
 
-  if (loading) {
+  if (userLoading || loading) {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
+  }
+
+  // Show nothing if user check is still pending or user doesn't have access
+  if (!user || user.role !== 'admin') {
+    return null;
   }
 
   return (

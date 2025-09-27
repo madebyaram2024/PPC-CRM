@@ -13,70 +13,65 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Robust fallback admin check for deployment consistency
-    if (email === 'admin@pacificpapercups.com' && password === 'admin123') {
+    const isProduction = process.env.NODE_ENV === 'production';
+    const disableSecureCookies = process.env.DISABLE_SECURE_COOKIES === 'true';
+
+    // Direct admin check - simplified approach
+    if ((email === 'admin@pacificpapercups.com' || email === 'admin@pacificcups.com') && password === 'admin123') {
       const adminUser = {
         id: 'admin-user-id',
-        email: 'admin@pacificpapercups.com',
+        email: email,
         name: 'Admin User',
         role: 'admin'
       };
 
-      console.log('Login: Admin fallback authentication triggered for', email);
+      console.log('Login: Admin authentication successful for', email);
+      
+      // Create response and set the session cookie with environment-aware settings
       const response = NextResponse.json(adminUser);
-      response.cookies.set('session', adminUser.id, {
+      response.cookies.set('session', 'admin-user-id', {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: isProduction && !disableSecureCookies, // Environment-aware secure flag
         sameSite: 'lax',
-        maxAge: 60 * 60 * 24 * 7, // 7 days
+        maxAge: 7 * 24 * 60 * 60, // 7 days
+        path: '/',
+        domain: process.env.COOKIE_DOMAIN || undefined, // Allow custom domain
       });
-      return response;
-    }
-    
-    // Also support the old email for consistency
-    if (email === 'admin@pacificcups.com' && password === 'admin123') {
-      const adminUser = {
-        id: 'admin-user-id',
-        email: 'admin@pacificcups.com',
-        name: 'Admin User',
-        role: 'admin'
-      };
-
-      console.log('Login: Admin fallback authentication triggered for', email);
-      const response = NextResponse.json(adminUser);
-      response.cookies.set('session', adminUser.id, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 60 * 60 * 24 * 7, // 7 days
+      
+      console.log('Login: Session cookie set with options:', {
+        secure: isProduction && !disableSecureCookies,
+        domain: process.env.COOKIE_DOMAIN || 'default',
+        isProduction,
+        disableSecureCookies
       });
+      
       return response;
     }
 
-    // Try database lookup
+    // Try database lookup for regular users
     try {
       const user = await db.user.findUnique({
         where: { email },
       });
 
       if (user && await bcrypt.compare(password, user.password)) {
-        // For admin emails, ensure they get admin role regardless of database role
-        const isPrimaryAdmin = email === 'admin@pacificpapercups.com' || email === 'admin@pacificcups.com';
-        const effectiveRole = isPrimaryAdmin ? 'admin' : user.role;
-
         const response = NextResponse.json({
           id: user.id,
           email: user.email,
           name: user.name,
-          role: effectiveRole,
+          role: user.role,
         });
 
+        // Set regular user session with environment-aware settings
         response.cookies.set('session', user.id, {
           httpOnly: true,
-          secure: process.env.NODE_ENV === 'production',
+          secure: isProduction && !disableSecureCookies, // Environment-aware secure flag
           sameSite: 'lax',
-          maxAge: 60 * 60 * 24 * 7, // 7 days
+          maxAge: 7 * 24 * 60 * 60, // 7 days
+          path: '/',
+          domain: process.env.COOKIE_DOMAIN || undefined, // Allow custom domain
         });
+        
         return response;
       }
     } catch (dbError) {
