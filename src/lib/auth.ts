@@ -7,6 +7,24 @@ import { compare } from 'bcryptjs';
 const SESSION_COOKIE_NAME = 'session';
 
 /**
+ * A centralized list of administrative email addresses.
+ * This ensures that admin role checks are consistent across the application.
+ */
+export const ADMIN_EMAILS = [
+  'admin@pacificpapercups.com',
+  'admin@pacificcups.com',
+];
+
+/**
+ * Checks if an email address belongs to an administrator.
+ * @param email The email address to check.
+ * @returns True if the email is an admin email, false otherwise.
+ */
+export function isAdminEmail(email: string): boolean {
+  return ADMIN_EMAILS.includes(email.toLowerCase());
+}
+
+/**
  * Creates a simple session cookie for proxy compatibility
  */
 export async function createSessionCookie(userId: string) {
@@ -183,8 +201,8 @@ export async function isAdminFromRequest(request: NextRequest): Promise<boolean>
       where: { id: userId },
     });
     
-    // Check if it's one of the admin emails
-    return user && (user.email === 'admin@pacificpapercups.com' || user.email === 'admin@pacificcups.com');
+    // Check if it's one of the admin emails or use the centralized function
+    return user && (user.role === 'admin' || isAdminEmail(user.email));
   } catch (error) {
     // Fallback: if DB is down but it's the admin ID, still allow access
     if (userId === 'admin-user-id') {
