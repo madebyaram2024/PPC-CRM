@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/contexts/user-context";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { PrintableInvoice } from "@/components/printable-invoice";
 import {
   ArrowLeft,
   FileText,
@@ -30,7 +47,10 @@ import {
   Edit,
   CheckCircle,
   Clock,
-  AlertCircle
+  AlertCircle,
+  Printer,
+  XCircle,
+  Trash2
 } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
@@ -112,6 +132,9 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
   const [invoiceId, setInvoiceId] = useState<string>('');
+  const [showVoidDialog, setShowVoidDialog] = useState(false);
+  const [showPrintDialog, setShowPrintDialog] = useState(false);
+  const printRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     params.then(p => setInvoiceId(p.id));
@@ -190,6 +213,63 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
     }
   };
 
+  const handleVoidInvoice = async () => {
+    try {
+      setUpdating(true);
+      const response = await fetch(`/api/invoices/${invoiceId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'void' }),
+      });
+
+      if (!response.ok) throw new Error("Failed to void invoice");
+
+      await fetchInvoice(); // Refresh data
+      toast.success("Invoice voided successfully");
+      setShowVoidDialog(false);
+    } catch (error) {
+      toast.error("Failed to void invoice");
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  const handlePrintInvoice = () => {
+    setShowPrintDialog(true);
+  };
+
+  const executePrint = () => {
+    if (printRef.current) {
+      const printWindow = window.open('', '_blank');
+      if (printWindow) {
+        printWindow.document.write(`
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <title>Invoice ${invoice?.number}</title>
+              <meta charset="utf-8">
+              <style>
+                body { margin: 0; padding: 20px; font-family: Arial, sans-serif; }
+                @media print {
+                  body { margin: 0; padding: 0; }
+                  .no-print { display: none !important; }
+                }
+              </style>
+            </head>
+            <body>
+              ${printRef.current.innerHTML}
+            </body>
+          </html>
+        `);
+        printWindow.document.close();
+        printWindow.focus();
+        printWindow.print();
+        printWindow.close();
+      }
+    }
+    setShowPrintDialog(false);
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'pending':
@@ -198,6 +278,8 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
         return 'bg-green-100 text-green-800 border-green-200';
       case 'overdue':
         return 'bg-red-100 text-red-800 border-red-200';
+      case 'void':
+        return 'bg-gray-100 text-gray-600 border-gray-300';
       default:
         return 'bg-gray-100 text-gray-800 border-gray-200';
     }
@@ -259,7 +341,7 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
           <Select
             value={invoice.status}
             onValueChange={updateInvoiceStatus}
-            disabled={updating}
+            disabled={updating || invoice.status === 'void'}
           >
             <SelectTrigger className="w-[120px]">
               <SelectValue />
@@ -268,6 +350,7 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
               <SelectItem value="pending">Pending</SelectItem>
               <SelectItem value="paid">Paid</SelectItem>
               <SelectItem value="overdue">Overdue</SelectItem>
+              <SelectItem value="void">Void</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -481,7 +564,7 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
               <CardTitle>Actions</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              {invoice.workOrders.length === 0 && (
+              {invoice.workOrders.length === 0 && invoice.status !== 'void' && (
                 <Button
                   onClick={createWorkOrder}
                   className="w-full"
@@ -493,12 +576,24 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
 
               <Button
                 variant="outline"
-                onClick={() => window.print()}
+                onClick={handlePrintInvoice}
                 className="w-full"
               >
-                <FileText className="mr-2 h-4 w-4" />
+                <Printer className="mr-2 h-4 w-4" />
                 Print Invoice
               </Button>
+
+              {invoice.status !== 'void' && (
+                <Button
+                  variant="destructive"
+                  onClick={() => setShowVoidDialog(true)}
+                  className="w-full"
+                  disabled={updating}
+                >
+                  <XCircle className="mr-2 h-4 w-4" />
+                  Void Invoice
+                </Button>
+              )}
             </CardContent>
           </Card>
 
@@ -524,6 +619,54 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
           )}
         </div>
       </div>
+
+      {/* Void Confirmation Dialog */}
+      <AlertDialog open={showVoidDialog} onOpenChange={setShowVoidDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Void Invoice</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to void this invoice? This action cannot be undone.
+              The invoice will be marked as void and can no longer be modified or used to create work orders.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleVoidInvoice}
+              className="bg-destructive text-destructive-foreground"
+              disabled={updating}
+            >
+              {updating ? "Voiding..." : "Void Invoice"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Print Preview Dialog */}
+      <Dialog open={showPrintDialog} onOpenChange={setShowPrintDialog}>
+        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Print Preview - {invoice?.number}</DialogTitle>
+          </DialogHeader>
+
+          {invoice && (
+            <div className="space-y-4">
+              <PrintableInvoice ref={printRef} invoice={invoice} type="invoice" />
+
+              <div className="flex justify-end gap-2 pt-4 border-t no-print">
+                <Button variant="outline" onClick={() => setShowPrintDialog(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={executePrint}>
+                  <Printer className="mr-2 h-4 w-4" />
+                  Print
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

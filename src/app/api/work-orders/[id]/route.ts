@@ -123,23 +123,25 @@ export async function PATCH(
     if (shippedCompleted !== undefined) updateData.shippedCompleted = shippedCompleted;
     if (shippedPhoto !== undefined) updateData.shippedPhoto = shippedPhoto;
 
-    // Auto-update status based on completion
-    if (existingWorkOrder.customPrinted) {
-      // Custom printed: Check all 3 stages
-      if (updateData.shippedCompleted || 
-          (existingWorkOrder.printedCompleted && existingWorkOrder.productionCompleted && shippedCompleted)) {
-        updateData.status = "completed";
-      } else if (updateData.printedCompleted || updateData.productionCompleted || 
-                 existingWorkOrder.printedCompleted || existingWorkOrder.productionCompleted) {
-        updateData.status = "in_progress";
-      }
-    } else {
-      // Regular: Check 2 stages (production, shipped)
-      if (updateData.shippedCompleted || 
-          (existingWorkOrder.productionCompleted && shippedCompleted)) {
-        updateData.status = "completed";
-      } else if (updateData.productionCompleted || existingWorkOrder.productionCompleted) {
-        updateData.status = "in_progress";
+    // Only auto-update status if not manually setting status and not voided
+    if (status === undefined && existingWorkOrder.status !== "void") {
+      if (existingWorkOrder.customPrinted) {
+        // Custom printed: Check all 3 stages
+        if (updateData.shippedCompleted ||
+            (existingWorkOrder.printedCompleted && existingWorkOrder.productionCompleted && shippedCompleted)) {
+          updateData.status = "completed";
+        } else if (updateData.printedCompleted || updateData.productionCompleted ||
+                   existingWorkOrder.printedCompleted || existingWorkOrder.productionCompleted) {
+          updateData.status = "in_progress";
+        }
+      } else {
+        // Regular: Check 2 stages (production, shipped)
+        if (updateData.shippedCompleted ||
+            (existingWorkOrder.productionCompleted && shippedCompleted)) {
+          updateData.status = "completed";
+        } else if (updateData.productionCompleted || existingWorkOrder.productionCompleted) {
+          updateData.status = "in_progress";
+        }
       }
     }
 
@@ -165,11 +167,30 @@ export async function PATCH(
     // Create activity record for status changes
     if (status && status !== existingWorkOrder.status) {
       try {
+        // Handle user ID - if it's the fallback admin, find the real admin user
+        let actualUserId = user.id;
+        if (user.id === 'admin-user-id') {
+          const realAdminUser = await db.user.findFirst({
+            where: { email: 'admin@pacificpapercups.com' }
+          });
+          if (realAdminUser) {
+            actualUserId = realAdminUser.id;
+          }
+        }
+
+        let activityType = "work_order_updated";
+        let description = `Work order ${workOrder.number} status changed to ${status}`;
+
+        if (status === 'void') {
+          activityType = "work_order_voided";
+          description = `Voided work order ${workOrder.number}`;
+        }
+
         await db.activity.create({
           data: {
-            type: "work_order_updated",
-            description: `Work order ${workOrder.number} status changed to ${status}`,
-            userId: user.id,
+            type: activityType,
+            description: description,
+            userId: actualUserId,
             invoiceId: workOrder.invoiceId,
           }
         });

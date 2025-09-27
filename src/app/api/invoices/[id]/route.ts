@@ -122,6 +122,17 @@ export async function PATCH(
     const body = await request.json();
     const { status, amount, dueDate, notes } = body;
 
+    // Handle user ID - if it's the fallback admin, find the real admin user
+    let actualUserId = user.id;
+    if (user.id === 'admin-user-id') {
+      const realAdminUser = await db.user.findFirst({
+        where: { email: 'admin@pacificpapercups.com' }
+      });
+      if (realAdminUser) {
+        actualUserId = realAdminUser.id;
+      }
+    }
+
     const updateData: any = {};
     if (status !== undefined) updateData.status = status;
     if (amount !== undefined) updateData.amount = parseFloat(amount);
@@ -170,11 +181,19 @@ export async function PATCH(
     // Create activity record for status changes
     if (status !== undefined) {
       try {
+        let activityType = "invoice_updated";
+        let description = `Updated invoice status to ${status}`;
+
+        if (status === 'void') {
+          activityType = "invoice_voided";
+          description = `Voided invoice ${invoice.number}`;
+        }
+
         await db.activity.create({
           data: {
-            type: "invoice_updated",
-            description: `Updated invoice status to ${status}`,
-            userId: user.id,
+            type: activityType,
+            description: description,
+            userId: actualUserId,
             customerId: invoice.customerId,
             invoiceId: invoice.id,
           }

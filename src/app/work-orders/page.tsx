@@ -101,6 +101,8 @@ export default function WorkOrdersPage() {
         return 'bg-blue-100 text-blue-800 border-blue-200';
       case 'completed':
         return 'bg-green-100 text-green-800 border-green-200';
+      case 'void':
+        return 'bg-gray-100 text-gray-600 border-gray-300';
       default:
         return 'bg-gray-100 text-gray-800 border-gray-200';
     }
@@ -114,6 +116,8 @@ export default function WorkOrdersPage() {
         return <AlertCircle className="h-4 w-4" />;
       case 'completed':
         return <CheckCircle className="h-4 w-4" />;
+      case 'void':
+        return <Clock className="h-4 w-4" />;
       default:
         return <Clock className="h-4 w-4" />;
     }
@@ -185,6 +189,7 @@ export default function WorkOrdersPage() {
             <SelectItem value="pending">Pending</SelectItem>
             <SelectItem value="in_progress">In Progress</SelectItem>
             <SelectItem value="completed">Completed</SelectItem>
+            <SelectItem value="void">Void</SelectItem>
           </SelectContent>
         </Select>
       </div>
