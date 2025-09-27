@@ -36,9 +36,15 @@ const navigation = [
     permission: "manage_products",
   },
   {
+    name: "Invoices",
+    href: "/invoices",
+    icon: Receipt,
+    permission: "create_invoices",
+  },
+  {
     name: "Create Invoice",
     href: "/create-invoice",
-    icon: Receipt,
+    icon: FileText,
     permission: "create_invoices",
   },
   {

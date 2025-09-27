@@ -44,6 +44,7 @@ export async function GET(request: NextRequest) {
               select: {
                 name: true,
                 sku: true,
+                customPrinted: true,
               }
             }
           }
@@ -52,6 +53,13 @@ export async function GET(request: NextRequest) {
           select: {
             name: true,
             email: true,
+          }
+        },
+        workOrders: {
+          select: {
+            id: true,
+            number: true,
+            status: true,
           }
         }
       }

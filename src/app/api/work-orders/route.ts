@@ -120,13 +120,15 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      // If linked to invoice, determine if any products are custom printed
-      const hasCustomPrintedProducts = invoice.lineItems.some(
+    // If linked to invoice, determine if any products are custom printed
+    let hasCustomPrintedProducts = false;
+    if (invoice) {
+      hasCustomPrintedProducts = invoice.lineItems.some(
         item => item.product?.customPrinted
       );
-
-      // Override customPrinted based on products in invoice
-      if (hasCustomPrintedProducts) {
+      
+      // Auto-set customPrinted based on products in invoice
+      if (hasCustomPrintedProducts && customPrinted === undefined) {
         body.customPrinted = true;
       }
     }
@@ -134,7 +136,7 @@ export async function POST(request: NextRequest) {
     const workOrder = await db.workOrder.create({
       data: {
         number: workOrderNumber,
-        customPrinted: customPrinted || false,
+        customPrinted: body.customPrinted || false,
         invoiceId: invoiceId || null,
         companyId: company.id,
         userId: user.id,
