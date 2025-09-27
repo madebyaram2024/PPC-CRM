@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { UserProvider } from "@/contexts/user-context";
 import { AuthGuard } from "@/components/auth-guard";
 import { AppLayout } from "@/components/app-layout";
+import { ConsoleFilter } from "@/components/console-filter";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -45,6 +46,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+          <ConsoleFilter />
           <UserProvider>
             <AuthGuard>
               <AppLayout>
