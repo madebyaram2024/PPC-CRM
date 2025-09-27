@@ -76,26 +76,31 @@ interface WorkOrderDetails {
   }>;
 }
 
-export default function WorkOrderDetailPage({ params }: { params: { id: string } }) {
+export default function WorkOrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { user, loading: userLoading } = useUser();
   const router = useRouter();
   const [workOrder, setWorkOrder] = useState<WorkOrderDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [workOrderId, setWorkOrderId] = useState<string>('');
 
   useEffect(() => {
-    if (userLoading) return;
+    params.then(p => setWorkOrderId(p.id));
+  }, [params]);
+
+  useEffect(() => {
+    if (userLoading || !workOrderId) return;
     if (!user) {
       router.push('/login');
       return;
     }
     fetchWorkOrder();
-  }, [params.id, user, userLoading, router]);
+  }, [workOrderId, user, userLoading, router]);
 
   const fetchWorkOrder = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/work-orders/${params.id}`);
+      const response = await fetch(`/api/work-orders/${workOrderId}`);
       if (!response.ok) {
         if (response.status === 404) {
           toast.error("Work order not found");
@@ -116,7 +121,7 @@ export default function WorkOrderDetailPage({ params }: { params: { id: string }
 
   const updateWorkOrderStatus = async (updates: any) => {
     try {
-      const response = await fetch(`/api/work-orders/${params.id}`, {
+      const response = await fetch(`/api/work-orders/${workOrderId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updates),
@@ -185,7 +190,7 @@ export default function WorkOrderDetailPage({ params }: { params: { id: string }
       const uploadData = await uploadResponse.json();
       
       // Save document to work order
-      const saveResponse = await fetch(`/api/work-orders/${params.id}/documents`, {
+      const saveResponse = await fetch(`/api/work-orders/${workOrderId}/documents`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -128,6 +128,7 @@ export default function ProductsPage() {
       price: product.price.toString(),
       sku: product.sku || "",
       category: product.category || "",
+      customPrinted: product.customPrinted || false,
       isActive: product.isActive,
     });
     setIsDialogOpen(true);
@@ -178,12 +179,13 @@ export default function ProductsPage() {
       price: "",
       sku: "",
       category: "",
+      customPrinted: false,
       isActive: true,
     });
   };
 
   const getCategories = () => {
-    const categories = [...new Set(products.map(p => p.category).filter(Boolean))];
+    const categories = [...new Set(products.map(p => p.category).filter(Boolean))] as string[];
     return categories.sort();
   };
 

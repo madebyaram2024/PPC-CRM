@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getCurrentSessionUser } from "@/lib/auth";
+import { hash } from "bcryptjs";
 
 export async function GET(request: NextRequest) {
   try {
@@ -65,6 +66,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Generate a default password if not provided
+    const defaultPassword = password || 'tempPassword123';
+    const hashedPassword = await hash(defaultPassword, 12);
+
     // Check if user already exists
     const existingUser = await db.user.findUnique({
       where: { email }
@@ -77,10 +82,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const user = await db.user.create({
+    const newUser = await db.user.create({
       data: {
         email,
         name,
+        password: hashedPassword,
         role: role || "user",
       },
       select: {
@@ -92,7 +98,7 @@ export async function POST(request: NextRequest) {
       }
     });
 
-    return NextResponse.json(user, { status: 201 });
+    return NextResponse.json(newUser, { status: 201 });
   } catch (error) {
     console.error("Users POST error:", error);
     return NextResponse.json(

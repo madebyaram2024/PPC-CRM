@@ -64,6 +64,7 @@ interface LineItem {
   productId: string;
   quantity: number;
   unitPrice: number;
+  totalPrice: number;
   description?: string;
 }
 
@@ -205,6 +206,7 @@ export default function CreateEstimatePage() {
             productId: product.id,
             quantity: 1,
             unitPrice: product.price,
+            totalPrice: product.price,
             description: product.name,
           },
         ],

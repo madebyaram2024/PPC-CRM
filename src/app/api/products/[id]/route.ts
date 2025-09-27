@@ -3,9 +3,10 @@ import { db } from "@/lib/db";
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const params = await context.params;
     const body = await request.json();
     const { name, description, price, sku, category, isActive } = body;
 
@@ -50,9 +51,10 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const params = await context.params;
     // Check if product is used in any line items
     const lineItemsCount = await db.lineItem.count({
       where: { productId: params.id }

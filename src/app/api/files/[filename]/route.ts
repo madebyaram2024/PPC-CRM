@@ -5,9 +5,10 @@ import { getCurrentSessionUser } from "@/lib/auth";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { filename: string } }
+  context: { params: Promise<{ filename: string }> }
 ) {
   try {
+    const params = await context.params;
     // Check authentication for file access
     const user = await getCurrentSessionUser();
     if (!user) {
@@ -40,7 +41,7 @@ export async function GET(
 
       const contentType = contentTypeMap[extension || ''] || 'application/octet-stream';
 
-      return new NextResponse(fileBuffer, {
+      return new NextResponse(fileBuffer.buffer as ArrayBuffer, {
         headers: {
           'Content-Type': contentType,
           'Content-Disposition': `inline; filename="${filename}"`,

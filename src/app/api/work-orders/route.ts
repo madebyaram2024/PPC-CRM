@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
     const workOrderNumber = number || `WO-${Date.now()}`;
 
     // Check if invoice exists (if provided)
-    let invoice = null;
+    let invoice: any = null;
     if (invoiceId) {
       invoice = await db.invoice.findUnique({
         where: { id: invoiceId },
@@ -119,6 +119,7 @@ export async function POST(request: NextRequest) {
           { status: 404 }
         );
       }
+    }
 
     // If linked to invoice, determine if any products are custom printed
     let hasCustomPrintedProducts = false;

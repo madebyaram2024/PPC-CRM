@@ -64,6 +64,7 @@ interface LineItem {
   productId: string;
   quantity: number;
   unitPrice: number;
+  totalPrice: number;
   description?: string;
 }
 
@@ -191,7 +192,7 @@ export default function CreateInvoicePage() {
         ...formData,
         lineItems: formData.lineItems.map(item =>
           item.productId === product.id
-            ? { ...item, quantity: item.quantity + 1 }
+            ? { ...item, quantity: item.quantity + 1, totalPrice: (item.quantity + 1) * item.unitPrice }
             : item
         ),
       });
@@ -205,6 +206,7 @@ export default function CreateInvoicePage() {
             productId: product.id,
             quantity: 1,
             unitPrice: product.price,
+            totalPrice: product.price,
             description: product.name,
           },
         ],

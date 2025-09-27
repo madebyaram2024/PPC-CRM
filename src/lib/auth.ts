@@ -202,7 +202,7 @@ export async function isAdminFromRequest(request: NextRequest): Promise<boolean>
     });
     
     // Check if it's one of the admin emails or use the centralized function
-    return user && (user.role === 'admin' || isAdminEmail(user.email));
+    return !!(user && (user.role === 'admin' || isAdminEmail(user.email)));
   } catch (error) {
     // Fallback: if DB is down but it's the admin ID, still allow access
     if (userId === 'admin-user-id') {

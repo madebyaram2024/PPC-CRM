@@ -4,9 +4,10 @@ import { getCurrentSessionUser } from "@/lib/auth";
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const params = await context.params;
     // Check authentication and admin privileges
     const user = await getCurrentSessionUser();
     if (!user) {
@@ -59,24 +60,6 @@ export async function DELETE(
     });
 
     return NextResponse.json({ message: "User deleted successfully" });
-  } catch (error) {
-    console.error("User DELETE error:", error);
-    return NextResponse.json(
-      { error: "Failed to delete user" },
-      { status: 500 }
-    );
-  }
-}
-        { error: "Cannot delete user with existing customers or invoices" },
-        { status: 400 }
-      );
-    }
-
-    await db.user.delete({
-      where: { id: params.id }
-    });
-
-    return NextResponse.json({ success: true });
   } catch (error) {
     console.error("User DELETE error:", error);
     return NextResponse.json(

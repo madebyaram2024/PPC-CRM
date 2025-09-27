@@ -4,9 +4,10 @@ import { getCurrentSessionUser } from "@/lib/auth";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const params = await context.params;
     // Check authentication
     const user = await getCurrentSessionUser();
     if (!user) {
@@ -81,9 +82,10 @@ export async function GET(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const params = await context.params;
     // Check authentication
     const user = await getCurrentSessionUser();
     if (!user) {
@@ -188,9 +190,10 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const params = await context.params;
     // Check authentication
     const user = await getCurrentSessionUser();
     if (!user) {
