@@ -93,8 +93,8 @@ export function NavigationSidebar() {
           <div className="flex items-center space-x-2">
             <div className="relative w-8 h-8">
               <img
-                src="/logo.svg"
-                alt="Logo"
+                src="/logo.png"
+                alt="Pacific Paper Cups Logo"
                 className="w-full h-full object-contain"
               />
             </div>
@@ -130,8 +130,8 @@ export function NavigationSidebar() {
         <Link href="/" className="flex items-center space-x-2">
           <div className="relative w-8 h-8">
             <img
-              src="/logo.svg"
-              alt="Logo"
+              src="/logo.png"
+              alt="Pacific Paper Cups Logo"
               className="w-full h-full object-contain"
             />
           </div>

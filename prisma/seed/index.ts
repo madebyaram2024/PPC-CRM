@@ -70,16 +70,18 @@ async function main() {
     where: { id: 'default-company' },
     update: {
       name: 'Pacific Paper Cups',
-      phone: '+1-555-0123',
-      logo: '/logo.svg', // Path to logo, can be updated to actual logo URL
+      email: 'info@pacificpapercups.com',
+      phone: '818.355.0103',
+      address: '11183 Condor Ave, Huntington Beach, CA 92708',
+      logo: '/logo.png', // Using the logo.png file from public folder
     },
     create: {
       id: 'default-company',
       name: 'Pacific Paper Cups',
-      email: 'info@pacificcups.com',
-      phone: '+1-555-0123',
-      address: '123 Business Street, City, State 12345',
-      logo: '/logo.svg', // Path to logo, can be updated to actual logo URL
+      email: 'info@pacificpapercups.com',
+      phone: '818.355.0103',
+      address: '11183 Condor Ave, Huntington Beach, CA 92708',
+      logo: '/logo.png', // Using the logo.png file from public folder
     },
   });
 

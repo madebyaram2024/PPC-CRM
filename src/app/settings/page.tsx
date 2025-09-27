@@ -84,7 +84,7 @@ export default function SettingsPage() {
         email: data.email || "",
         phone: data.phone || "",
         address: data.address || "",
-        logo: data.logo || "",
+        logo: "/logo.png", // Always use the static logo
       });
     } catch (error) {
       toast.error("Failed to load company data");
@@ -195,34 +195,21 @@ export default function SettingsPage() {
                     Upload Logo
                   </Label>
                   <div className="flex items-center space-x-4">
+                    <div className="text-sm text-muted-foreground">
+                      Using logo.png from public folder
+                    </div>
                     <Button
                       type="button"
                       variant="outline"
-                      onClick={() => document.getElementById("logo-upload")?.click()}
-                      disabled={uploading}
+                      disabled
+                      className="opacity-50"
                     >
                       <Upload className="mr-2 h-4 w-4" />
-                      {uploading ? "Uploading..." : "Upload Logo"}
+                      Logo Upload (Disabled)
                     </Button>
-                    <input
-                      id="logo-upload"
-                      type="file"
-                      accept="image/*"
-                      onChange={handleLogoUpload}
-                      className="hidden"
-                    />
-                    {formData.logo && (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={handleRemoveLogo}
-                      >
-                        Remove
-                      </Button>
-                    )}
                   </div>
                   <p className="text-sm text-muted-foreground mt-2">
-                    PNG, JPG, or GIF up to 5MB
+                    Logo is automatically loaded from /public/logo.png file
                   </p>
                 </div>
               </div>

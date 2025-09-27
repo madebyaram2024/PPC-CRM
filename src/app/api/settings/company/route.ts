@@ -91,7 +91,7 @@ export async function PUT(request: NextRequest) {
         email: email || existingCompany.email,
         phone: phone || existingCompany.phone,
         address: address || existingCompany.address,
-        logo: logo || existingCompany.logo,
+        logo: "/logo.png", // Always use the static logo file
       },
       select: {
         name: true,
