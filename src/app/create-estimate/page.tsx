@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useUser } from "@/contexts/user-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -78,6 +80,8 @@ interface FormData {
 }
 
 export default function CreateEstimatePage() {
+  const { user, loading: userLoading } = useUser();
+  const router = useRouter();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [company, setCompany] = useState<Company | null>(null);
@@ -94,10 +98,15 @@ export default function CreateEstimatePage() {
   });
 
   useEffect(() => {
+    if (userLoading) return;
+    if (!user) {
+      router.push('/login');
+      return;
+    }
     fetchCustomers();
     fetchProducts();
     fetchCompany();
-  }, []);
+  }, [user, userLoading, router]);
 
   const fetchCustomers = async () => {
     try {
@@ -245,6 +254,20 @@ export default function CreateEstimatePage() {
     (sum, item) => sum + (item.quantity * item.unitPrice),
     0
   );
+
+  // Show loading while checking authentication
+  if (userLoading) {
+    return (
+      <div className="p-6 flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  // Redirect to login if not authenticated (handled by useEffect)
+  if (!user) {
+    return null;
+  }
 
   return (
     <div className="p-6 space-y-6">
