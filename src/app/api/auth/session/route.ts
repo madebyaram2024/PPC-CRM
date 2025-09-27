@@ -20,7 +20,6 @@ export async function GET() {
       name: user.name
     });
   } catch (error) {
-    console.error('Session check error:', error);
     return NextResponse.json(
       { error: 'Authentication check failed' },
       { status: 500 }

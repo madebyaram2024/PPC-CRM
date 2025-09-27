@@ -25,7 +25,6 @@ export async function POST(request: NextRequest) {
         role: 'admin'
       };
 
-      console.log('Login: Admin authentication successful for', email);
       
       // Create response and set the session cookie with environment-aware settings
       const response = NextResponse.json(adminUser);
@@ -38,12 +37,6 @@ export async function POST(request: NextRequest) {
         domain: process.env.COOKIE_DOMAIN || undefined, // Allow custom domain
       });
       
-      console.log('Login: Session cookie set with options:', {
-        secure: isProduction && !disableSecureCookies,
-        domain: process.env.COOKIE_DOMAIN || 'default',
-        isProduction,
-        disableSecureCookies
-      });
       
       return response;
     }

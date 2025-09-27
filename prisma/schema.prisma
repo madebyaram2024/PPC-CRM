@@ -99,7 +99,7 @@ model Invoice {
   amount      Float
   status      String   @default("pending") // "pending", "paid", "overdue"
   dueDate     DateTime
-  createdAt   DateTime @updatedAt
+  createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   
   // Relations

@@ -151,11 +151,27 @@ export default function CreateInvoicePage() {
   };
 
   const handleCreateInvoice = async () => {
+    if (formData.lineItems.length === 0) {
+      toast.error("Please add at least one product");
+      return;
+    }
+
+    if (!formData.customerId) {
+      toast.error("Please select a customer");
+      return;
+    }
+
+    if (!formData.dueDate) {
+      toast.error("Please select a due date");
+      return;
+    }
+
     try {
       const totalAmount = formData.lineItems.reduce(
         (sum, item) => sum + (item.quantity * item.unitPrice),
         0
       );
+
 
       const response = await fetch("/api/documents", {
         method: "POST",

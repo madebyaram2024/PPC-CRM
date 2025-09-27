@@ -59,6 +59,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Handle user ID - if it's the fallback admin, find the real admin user
+    let actualUserId = user.id;
+    if (user.id === 'admin-user-id') {
+      const realAdminUser = await db.user.findFirst({
+        where: { email: 'admin@pacificpapercups.com' }
+      });
+      if (realAdminUser) {
+        actualUserId = realAdminUser.id;
+      } else {
+        return NextResponse.json(
+          { error: "Admin user not found in database" },
+          { status: 500 }
+        );
+      }
+    }
+
     // Generate invoice number
     const invoiceNumber = `${type === "invoice" ? "INV" : "EST"}-${Date.now()}`;
 
@@ -70,7 +86,7 @@ export async function POST(request: NextRequest) {
         status: "pending",
         customerId,
         companyId: company.id,
-        userId: user.id,
+        userId: actualUserId,
       },
       include: {
         customer: {
@@ -107,7 +123,7 @@ export async function POST(request: NextRequest) {
       data: {
         type: "invoice_created",
         description: `Created ${type} for ${document.customer.name}`,
-        userId: user.id,
+        userId: actualUserId,
         customerId,
         invoiceId: document.id,
       }

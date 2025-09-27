@@ -30,11 +30,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         const response = await fetch('/api/auth/session');
         if (response.ok) {
           const userData = await response.json();
-          console.log('User Context: Session data received:', userData);
           setUser(userData);
-          console.log('User Context: User data set:', userData);
-        } else {
-          console.log('User Context: Session check failed');
         }
       } catch (error) {
         console.error('Failed to check session:', error);
@@ -77,15 +73,12 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   };
 
   const hasPermission = (permission: string): boolean => {
-    console.log('hasPermission called with permission:', permission, 'for user:', user);
     if (!user) {
-      console.log('hasPermission: No user, returning false');
       return false;
     }
-    
+
     // Admin has all permissions
     if (user.role === 'admin') {
-      console.log('hasPermission: User is admin, returning true for permission:', permission);
       return true;
     }
     
@@ -99,13 +92,10 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     // Check if user has specific permission
     const userPermissions = permissions[user.role];
     if (userPermissions?.includes('*')) {
-      console.log('hasPermission: User role has wildcard permissions, returning true');
       return true;
     }
-    
-    const hasPerm = userPermissions?.includes(permission) || false;
-    console.log('hasPermission: Checking specific permission result:', hasPerm, 'for role:', user.role, 'permission:', permission);
-    return hasPerm;
+
+    return userPermissions?.includes(permission) || false;
   };
 
   return (
