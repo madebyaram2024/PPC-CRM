@@ -72,9 +72,9 @@ export const PrintableInvoice = forwardRef<HTMLDivElement, PrintableInvoiceProps
             <div>
               <h1 className="text-2xl font-bold text-gray-900">{invoice.company.name}</h1>
               {invoice.company.address && (
-                <p className="text-gray-600 mt-1">{invoice.company.address}</p>
+                <p className="text-gray-600 mt-2 leading-relaxed">{invoice.company.address}</p>
               )}
-              <div className="flex gap-4 mt-1 text-sm text-gray-600">
+              <div className="flex gap-6 mt-3 text-sm text-gray-600">
                 {invoice.company.phone && <span>Phone: {invoice.company.phone}</span>}
                 {invoice.company.email && <span>Email: {invoice.company.email}</span>}
               </div>
@@ -82,8 +82,8 @@ export const PrintableInvoice = forwardRef<HTMLDivElement, PrintableInvoiceProps
           </div>
 
           <div className="text-right">
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">{documentTitle}</h2>
-            <div className="text-sm text-gray-600 space-y-1">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">{documentTitle}</h2>
+            <div className="text-sm text-gray-600 space-y-2">
               <div><strong>{documentTitle} #:</strong> {invoice.number}</div>
               <div><strong>Date:</strong> {format(new Date(invoice.createdAt), 'MMM dd, yyyy')}</div>
               <div><strong>Due Date:</strong> {format(new Date(invoice.dueDate), 'MMM dd, yyyy')}</div>
@@ -92,21 +92,21 @@ export const PrintableInvoice = forwardRef<HTMLDivElement, PrintableInvoiceProps
         </div>
 
         {/* Bill To Section */}
-        <div className="mb-8">
-          <h3 className="text-lg font-semibold text-gray-900 mb-3">Bill To:</h3>
-          <div className="bg-gray-50 p-4 rounded">
-            <div className="font-semibold text-gray-900">
+        <div className="mb-10">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Bill To:</h3>
+          <div className="bg-gray-50 p-5 rounded">
+            <div className="font-semibold text-gray-900 text-base">
               {invoice.customer.companyName || invoice.customer.name}
             </div>
             {invoice.customer.companyName && invoice.customer.contactName && (
-              <div className="text-gray-700">Attn: {invoice.customer.contactName}</div>
+              <div className="text-gray-700 mt-1">Attn: {invoice.customer.contactName}</div>
             )}
             {(invoice.customer.billingAddress || invoice.customer.address) && (
-              <div className="text-gray-700 mt-1">
+              <div className="text-gray-700 mt-2 leading-relaxed">
                 {invoice.customer.billingAddress || invoice.customer.address}
               </div>
             )}
-            <div className="flex gap-4 mt-2 text-sm text-gray-600">
+            <div className="flex gap-6 mt-3 text-sm text-gray-600">
               {(invoice.customer.contactEmail || invoice.customer.email) && (
                 <span>Email: {invoice.customer.contactEmail || invoice.customer.email}</span>
               )}
@@ -118,33 +118,33 @@ export const PrintableInvoice = forwardRef<HTMLDivElement, PrintableInvoiceProps
         </div>
 
         {/* Line Items Table */}
-        <div className="mb-8">
+        <div className="mb-10">
           <table className="w-full border-collapse border border-gray-300">
             <thead>
               <tr className="bg-gray-100">
-                <th className="border border-gray-300 px-4 py-2 text-left">Description</th>
-                <th className="border border-gray-300 px-4 py-2 text-center">Qty</th>
-                <th className="border border-gray-300 px-4 py-2 text-right">Unit Price</th>
-                <th className="border border-gray-300 px-4 py-2 text-right">Total</th>
+                <th className="border border-gray-300 px-5 py-3 text-left font-semibold">Description</th>
+                <th className="border border-gray-300 px-5 py-3 text-center font-semibold">Qty</th>
+                <th className="border border-gray-300 px-5 py-3 text-right font-semibold">Unit Price</th>
+                <th className="border border-gray-300 px-5 py-3 text-right font-semibold">Total</th>
               </tr>
             </thead>
             <tbody>
               {invoice.lineItems.map((item, index) => (
                 <tr key={item.id} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
-                  <td className="border border-gray-300 px-4 py-2">
+                  <td className="border border-gray-300 px-5 py-4">
                     <div>
                       <div className="font-medium">{item.product?.name || item.description}</div>
                       {item.product?.sku && (
-                        <div className="text-sm text-gray-500">SKU: {item.product.sku}</div>
+                        <div className="text-sm text-gray-500 mt-1">SKU: {item.product.sku}</div>
                       )}
                       {item.product?.customPrinted && (
-                        <div className="text-sm text-purple-600 font-medium">Custom Printed</div>
+                        <div className="text-sm text-purple-600 font-medium mt-1">Custom Printed</div>
                       )}
                     </div>
                   </td>
-                  <td className="border border-gray-300 px-4 py-2 text-center">{item.quantity}</td>
-                  <td className="border border-gray-300 px-4 py-2 text-right">${item.unitPrice.toFixed(2)}</td>
-                  <td className="border border-gray-300 px-4 py-2 text-right">${item.totalPrice.toFixed(2)}</td>
+                  <td className="border border-gray-300 px-5 py-4 text-center">{item.quantity}</td>
+                  <td className="border border-gray-300 px-5 py-4 text-right">${item.unitPrice.toFixed(2)}</td>
+                  <td className="border border-gray-300 px-5 py-4 text-right">${item.totalPrice.toFixed(2)}</td>
                 </tr>
               ))}
             </tbody>
