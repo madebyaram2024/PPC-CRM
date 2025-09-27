@@ -59,9 +59,11 @@ export function UserMenu() {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          <User className="mr-2 h-4 w-4" />
-          <span>Profile</span>
+        <DropdownMenuItem asChild>
+          <a href="/profile">
+            <User className="mr-2 h-4 w-4" />
+            <span>Profile</span>
+          </a>
         </DropdownMenuItem>
         {user.role === 'admin' && (
           <DropdownMenuItem asChild>

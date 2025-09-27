@@ -12,6 +12,7 @@ import {
   Settings,
   UserCog,
   Package,
+  User,
 } from "lucide-react";
 
 const navigation = [
@@ -44,6 +45,12 @@ const navigation = [
     href: "/create-estimate",
     icon: FileText,
     permission: "create_estimates",
+  },
+  {
+    name: "Profile",
+    href: "/profile",
+    icon: User,
+    permission: "view_dashboard", // All users can access profile
   },
   {
     name: "Company Settings",
