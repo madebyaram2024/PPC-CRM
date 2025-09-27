@@ -1,8 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { getCurrentSessionUser } from "@/lib/auth";
 
 export async function GET(request: NextRequest) {
   try {
+    // Check authentication
+    const user = await getCurrentSessionUser();
+    if (!user) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const search = searchParams.get("search") || "";
     const category = searchParams.get("category") || "";
@@ -43,11 +50,55 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    // Check authentication
+    const user = await getCurrentSessionUser();
+    if (!user) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+    }
+
     const body = await request.json();
     const { name, description, price, sku, category } = body;
 
     if (!name || !price) {
       return NextResponse.json(
+        { error: "Name and price are required" },
+        { status: 400 }
+      );
+    }
+
+    // Check if SKU already exists (if provided)
+    if (sku) {
+      const existingSku = await db.product.findUnique({
+        where: { sku }
+      });
+      if (existingSku) {
+        return NextResponse.json(
+          { error: "SKU already exists" },
+          { status: 400 }
+        );
+      }
+    }
+
+    const product = await db.product.create({
+      data: {
+        name,
+        description,
+        price: parseFloat(price),
+        sku,
+        category,
+        isActive: true,
+      }
+    });
+
+    return NextResponse.json(product, { status: 201 });
+  } catch (error) {
+    console.error("Products POST error:", error);
+    return NextResponse.json(
+      { error: "Failed to create product" },
+      { status: 500 }
+    );
+  }
+}
         { error: "Name and price are required" },
         { status: 400 }
       );
