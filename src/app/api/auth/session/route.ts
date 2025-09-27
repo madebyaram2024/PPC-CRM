@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { isAdminEmail, ADMIN_EMAILS } from '@/lib/auth';
 
 export async function GET(request: NextRequest) {
   try {
@@ -12,10 +13,10 @@ export async function GET(request: NextRequest) {
     // Handle fallback admin user
     if (sessionId === 'admin-user-id') {
       console.log('Session API: Fallback admin user detected');
-      // Return the primary email format
+      // Return a consistent admin user object
       return NextResponse.json({
         id: 'admin-user-id',
-        email: 'admin@pacificpapercups.com',
+        email: ADMIN_EMAILS[0], // Use the primary admin email
         name: 'Admin User',
         role: 'admin',
       });
@@ -28,10 +29,8 @@ export async function GET(request: NextRequest) {
       });
 
       if (user) {
-        // For database users with admin emails, check if they should have admin role
-        // This handles cases where a real user account exists with admin email but potentially wrong role
-        const isPrimaryAdmin = user.email === 'admin@pacificpapercups.com' || user.email === 'admin@pacificcups.com';
-        const effectiveRole = isPrimaryAdmin ? 'admin' : user.role;
+        // For all users, including those with an admin email, ensure the role is correct.
+        const effectiveRole = isAdminEmail(user.email) ? 'admin' : user.role;
 
         return NextResponse.json({
           id: user.id,
@@ -42,6 +41,8 @@ export async function GET(request: NextRequest) {
       }
     } catch (dbError) {
       console.error('Database error in session check:', dbError);
+      // If the database is down, we cannot verify the session for a non-fallback user.
+      // The middleware will handle redirecting to the login page.
     }
 
     return NextResponse.json(null, { status: 401 });
