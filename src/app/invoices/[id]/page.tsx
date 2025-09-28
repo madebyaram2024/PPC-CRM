@@ -645,7 +645,7 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
 
       {/* Print Preview Dialog */}
       <Dialog open={showPrintDialog} onOpenChange={setShowPrintDialog}>
-        <DialogContent className="max-w-[95vw] max-h-[95vh] overflow-y-auto w-full">
+        <DialogContent className="max-w-none w-[95vw] h-[95vh] overflow-y-auto p-6" style={{ maxWidth: '95vw', width: '95vw', height: '95vh' }}>
           <DialogHeader>
             <DialogTitle>Print Preview - {invoice?.number}</DialogTitle>
           </DialogHeader>
@@ -667,6 +667,16 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Custom CSS to force large dialog */}
+      <style jsx global>{`
+        [data-state="open"] .fixed.inset-0 > div:last-child {
+          width: 95vw !important;
+          height: 95vh !important;
+          max-width: 95vw !important;
+          max-height: 95vh !important;
+        }
+      `}</style>
 
     </div>
   );
