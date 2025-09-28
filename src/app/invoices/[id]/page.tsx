@@ -198,11 +198,20 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
       // Convert invoice line items to work order line items format
       const lineItems = invoice.lineItems.map(item => ({
         productId: item.product?.id || null,
-        quantity: item.quantity,
-        unitPrice: item.unitPrice,
-        totalPrice: item.totalPrice,
+        quantity: Number(item.quantity),
+        unitPrice: Number(item.unitPrice),
+        totalPrice: Number(item.totalPrice),
         description: item.product?.name || item.description,
       }));
+
+      console.log('Creating work order with data:', {
+        invoiceId: invoice.id,
+        customerId: invoice.customer.id,
+        number: `${invoice.number}-WO-1`,
+        customPrinted: hasCustomPrintedProducts,
+        lineItems: lineItems,
+        amount: invoice.amount,
+      });
 
       const response = await fetch('/api/work-orders', {
         method: 'POST',
@@ -219,6 +228,7 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
 
       if (!response.ok) {
         const errorData = await response.json();
+        console.error('Work order creation failed:', errorData);
         throw new Error(errorData.error || "Failed to create work order");
       }
 
