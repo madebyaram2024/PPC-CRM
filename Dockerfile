@@ -25,8 +25,8 @@ RUN npx prisma generate && npm run build
 # Remove dev dependencies after build
 RUN npm prune --production
 
-# Create uploads directory
-RUN mkdir -p uploads
+# Create uploads directory with proper permissions
+RUN mkdir -p uploads && chmod 777 uploads
 
 # Expose port
 EXPOSE 3000
