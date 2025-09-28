@@ -35,4 +35,4 @@ ENV USE_SECURE_COOKIES=false
 ENV DISABLE_SECURE_COOKIES=true
 
 # Start the application with database setup
-CMD ["/bin/sh", "-c", "npx prisma migrate deploy && npx prisma generate && (npm run db:seed || echo 'Seed failed, continuing...') && npm start"]
+CMD ["/bin/sh", "-c", "npx prisma db push && npx prisma generate && (npm run db:seed || echo 'Seed failed, continuing...') && npm start"]
