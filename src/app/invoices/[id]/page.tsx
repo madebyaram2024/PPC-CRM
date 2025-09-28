@@ -239,40 +239,8 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
   };
 
   const executePrint = () => {
-    // Hide everything except the invoice content for printing
-    const styleSheet = document.createElement('style');
-    styleSheet.type = 'text/css';
-    styleSheet.innerText = `
-      @media print {
-        body * { visibility: hidden; }
-        .print-content, .print-content * { visibility: visible; }
-        .print-content {
-          position: absolute;
-          left: 0;
-          top: 0;
-          width: 100%;
-        }
-        .no-print { display: none !important; }
-      }
-    `;
-    document.head.appendChild(styleSheet);
-
-    // Add print-content class to the invoice element
-    if (printRef.current) {
-      printRef.current.classList.add('print-content');
-    }
-
-    // Trigger print
     window.print();
-
-    // Clean up after printing
-    setTimeout(() => {
-      document.head.removeChild(styleSheet);
-      if (printRef.current) {
-        printRef.current.classList.remove('print-content');
-      }
-      setShowPrintDialog(false);
-    }, 100);
+    setShowPrintDialog(false);
   };
 
   const getStatusColor = (status: string) => {
@@ -657,7 +625,9 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
 
           {invoice && (
             <div className="space-y-4">
-              <PrintableInvoice ref={printRef} invoice={invoice} type="invoice" />
+              <div className="print-area">
+                <PrintableInvoice ref={printRef} invoice={invoice} type="invoice" />
+              </div>
 
               <div className="flex justify-end gap-2 pt-4 border-t no-print">
                 <Button variant="outline" onClick={() => setShowPrintDialog(false)}>
@@ -673,13 +643,31 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
         </DialogContent>
       </Dialog>
 
-      {/* Custom CSS to force large dialog */}
+      {/* Custom CSS to force large dialog and print styles */}
       <style jsx global>{`
         [data-state="open"] .fixed.inset-0 > div:last-child {
           width: 95vw !important;
           height: 95vh !important;
           max-width: 95vw !important;
           max-height: 95vh !important;
+        }
+
+        @media print {
+          body * {
+            visibility: hidden;
+          }
+          .print-area, .print-area * {
+            visibility: visible;
+          }
+          .print-area {
+            position: absolute !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 100% !important;
+          }
+          .no-print {
+            display: none !important;
+          }
         }
       `}</style>
 
