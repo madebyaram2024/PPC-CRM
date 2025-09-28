@@ -239,38 +239,40 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
   };
 
   const executePrint = () => {
-    if (printRef.current) {
-      const printWindow = window.open('', '_blank');
-      if (printWindow) {
-        printWindow.document.write(`
-          <html>
-            <head>
-              <title>Invoice ${invoice?.number}</title>
-              <style>
-                body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-                .bg-gray-50 { background-color: #f9fafb !important; }
-                .bg-gray-100 { background-color: #f3f4f6 !important; }
-                .text-purple-600 { color: #9333ea !important; }
-                .text-red-500 { color: #ef4444 !important; }
-                .border-red-500 { border-color: #ef4444 !important; }
-                @media print {
-                  .no-print { display: none !important; }
-                  body { margin: 0 !important; padding: 0 !important; }
-                }
-              </style>
-            </head>
-            <body>
-              ${printRef.current.innerHTML}
-            </body>
-          </html>
-        `);
-        printWindow.document.close();
-        printWindow.focus();
-        printWindow.print();
-        printWindow.close();
+    // Hide everything except the invoice content for printing
+    const styleSheet = document.createElement('style');
+    styleSheet.type = 'text/css';
+    styleSheet.innerText = `
+      @media print {
+        body * { visibility: hidden; }
+        .print-content, .print-content * { visibility: visible; }
+        .print-content {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 100%;
+        }
+        .no-print { display: none !important; }
       }
+    `;
+    document.head.appendChild(styleSheet);
+
+    // Add print-content class to the invoice element
+    if (printRef.current) {
+      printRef.current.classList.add('print-content');
     }
-    setShowPrintDialog(false);
+
+    // Trigger print
+    window.print();
+
+    // Clean up after printing
+    setTimeout(() => {
+      document.head.removeChild(styleSheet);
+      if (printRef.current) {
+        printRef.current.classList.remove('print-content');
+      }
+      setShowPrintDialog(false);
+    }, 100);
   };
 
   const getStatusColor = (status: string) => {
