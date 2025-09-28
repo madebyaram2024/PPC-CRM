@@ -83,6 +83,7 @@ export default function WorkOrderDetailPage({ params }: { params: Promise<{ id: 
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [workOrderId, setWorkOrderId] = useState<string>('');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   useEffect(() => {
     params.then(p => setWorkOrderId(p.id));
@@ -172,12 +173,17 @@ export default function WorkOrderDetailPage({ params }: { params: Promise<{ id: 
     }
   };
 
-  const handleDocumentUpload = async (file: File) => {
+  const handleDocumentUpload = async () => {
+    if (!selectedFile) {
+      toast.error("Please select a file first");
+      return;
+    }
+
     try {
       setUploading(true);
-      
+
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append('file', selectedFile);
       formData.append('type', 'document');
 
       const uploadResponse = await fetch('/api/upload', {
@@ -186,25 +192,30 @@ export default function WorkOrderDetailPage({ params }: { params: Promise<{ id: 
       });
 
       if (!uploadResponse.ok) throw new Error("Failed to upload document");
-      
+
       const uploadData = await uploadResponse.json();
-      
+
       // Save document to work order
       const saveResponse = await fetch(`/api/work-orders/${workOrderId}/documents`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           filename: uploadData.filename,
-          originalName: uploadData.originalName || file.name,
+          originalName: uploadData.originalName || selectedFile.name,
           path: uploadData.url || uploadData.path,
-          mimeType: uploadData.mimeType || file.type,
-          size: uploadData.size || file.size,
+          mimeType: uploadData.mimeType || selectedFile.type,
+          size: uploadData.size || selectedFile.size,
         }),
       });
 
       if (!saveResponse.ok) throw new Error("Failed to save document");
-      
+
       await fetchWorkOrder(); // Refresh to show new document
+      setSelectedFile(null); // Clear selected file
+      // Reset file input
+      const fileInput = document.getElementById('document-upload') as HTMLInputElement;
+      if (fileInput) fileInput.value = '';
+
       toast.success("Document uploaded successfully");
     } catch (error) {
       toast.error("Failed to upload document");
@@ -394,20 +405,35 @@ export default function WorkOrderDetailPage({ params }: { params: Promise<{ id: 
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div>
+              <div className="space-y-3">
                 <Label htmlFor="document-upload" className="text-sm font-medium">
                   Upload Document
                 </Label>
-                <Input
-                  id="document-upload"
-                  type="file"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) handleDocumentUpload(file);
-                  }}
-                  disabled={uploading}
-                  className="mt-2"
-                />
+                <div className="flex gap-2">
+                  <Input
+                    id="document-upload"
+                    type="file"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      setSelectedFile(file || null);
+                    }}
+                    disabled={uploading}
+                    className="flex-1"
+                    accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                  />
+                  <Button
+                    onClick={handleDocumentUpload}
+                    disabled={uploading || !selectedFile}
+                    size="sm"
+                  >
+                    {uploading ? "Uploading..." : "Upload"}
+                  </Button>
+                </div>
+                {selectedFile && (
+                  <p className="text-sm text-muted-foreground">
+                    Selected: {selectedFile.name} ({(selectedFile.size / 1024).toFixed(1)} KB)
+                  </p>
+                )}
               </div>
 
               {workOrder.documents.length === 0 ? (
