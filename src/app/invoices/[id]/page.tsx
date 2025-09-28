@@ -262,46 +262,48 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
       const printWindow = window.open('', '_blank');
       if (printWindow) {
         const invoiceContent = printRef.current.innerHTML;
+        
+        // Create a complete HTML page with Tailwind CDN for proper styling
         printWindow.document.write(`
           <!DOCTYPE html>
           <html>
             <head>
               <title>Invoice ${invoice?.number}</title>
               <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1">
+              <script src="https://cdn.tailwindcss.com"></script>
               <style>
                 body {
                   margin: 0;
                   padding: 20px;
                   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                  color: black;
-                  background: white;
                 }
-                .bg-gray-50 { background-color: #f9fafb !important; }
-                .bg-gray-100 { background-color: #f3f4f6 !important; }
-                .text-purple-600 { color: #9333ea !important; }
-                .text-red-500 { color: #ef4444 !important; }
-                .border-red-500 { border-color: #ef4444 !important; }
-                .text-gray-900 { color: #111827 !important; }
-                .text-gray-700 { color: #374151 !important; }
-                .text-gray-600 { color: #4b5563 !important; }
-                .text-gray-500 { color: #6b7280 !important; }
-                .border-gray-300 { border-color: #d1d5db !important; }
-                .border-gray-900 { border-color: #111827 !important; }
                 @media print {
                   body { margin: 0; padding: 20px; }
                   @page { margin: 0.5in; }
                 }
+                /* Specific logo styling for print */
+                .print-logo {
+                  max-height: 80px;
+                  width: auto;
+                }
               </style>
             </head>
-            <body>
-              ${invoiceContent}
+            <body class="bg-white text-black">
+              <div class="p-8 max-w-4xl mx-auto">
+                ${invoiceContent}
+              </div>
             </body>
           </html>
         `);
         printWindow.document.close();
         printWindow.focus();
-        printWindow.print();
-        printWindow.close();
+        
+        // Wait a bit for the CDN to load before printing
+        setTimeout(() => {
+          printWindow.print();
+          printWindow.close();
+        }, 500);
       }
     }
     setShowPrintDialog(false);

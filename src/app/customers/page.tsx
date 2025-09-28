@@ -110,8 +110,8 @@ export default function CustomersPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.companyName) {
-      toast.error("Company Name is required");
+    if (!formData.name) {
+      toast.error("Customer Name is required");
       return;
     }
 
@@ -247,15 +247,26 @@ export default function CustomersPage() {
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="name" className="text-right">
+                    Customer Name *
+                  </Label>
+                  <Input
+                    id="name"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    className="col-span-3"
+                    required
+                  />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="companyName" className="text-right">
-                    Company Name *
+                    Company Name
                   </Label>
                   <Input
                     id="companyName"
                     value={formData.companyName}
                     onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
                     className="col-span-3"
-                    required
                   />
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
