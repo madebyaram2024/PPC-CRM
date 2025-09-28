@@ -239,34 +239,8 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
   };
 
   const executePrint = () => {
-    if (printRef.current) {
-      const printWindow = window.open('', '_blank');
-      if (printWindow) {
-        printWindow.document.write(`
-          <!DOCTYPE html>
-          <html>
-            <head>
-              <title>Invoice ${invoice?.number}</title>
-              <meta charset="utf-8">
-              <style>
-                body { margin: 0; padding: 20px; font-family: Arial, sans-serif; }
-                @media print {
-                  body { margin: 0; padding: 0; }
-                  .no-print { display: none !important; }
-                }
-              </style>
-            </head>
-            <body>
-              ${printRef.current.innerHTML}
-            </body>
-          </html>
-        `);
-        printWindow.document.close();
-        printWindow.focus();
-        printWindow.print();
-        printWindow.close();
-      }
-    }
+    // Open the dedicated print page which shows exactly the same content
+    window.open(`/invoices/${invoiceId}/print`, '_blank');
     setShowPrintDialog(false);
   };
 
