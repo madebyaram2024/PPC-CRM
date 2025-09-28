@@ -94,7 +94,6 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { invoiceId, customPrinted, number, customerId, notes, lineItems, amount } = body;
 
-    console.log('Work order creation request:', { invoiceId, customPrinted, number, customerId, lineItems, amount });
 
     // Validate required fields
     if (!customerId) {
@@ -181,11 +180,9 @@ export async function POST(request: NextRequest) {
       });
 
       // Create line items
-      console.log('Creating line items:', lineItems);
       const createdLineItems = await Promise.all(
-        lineItems.map((item: any) => {
-          console.log('Creating line item:', item);
-          return tx.workOrderLineItem.create({
+        lineItems.map((item: any) =>
+          tx.workOrderLineItem.create({
             data: {
               workOrderId: newWorkOrder.id,
               productId: item.productId,
@@ -194,8 +191,8 @@ export async function POST(request: NextRequest) {
               totalPrice: item.totalPrice,
               description: item.description,
             }
-          });
-        })
+          })
+        )
       );
 
       return { ...newWorkOrder, lineItems: createdLineItems };
