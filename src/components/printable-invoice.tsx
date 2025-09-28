@@ -185,7 +185,7 @@ export const PrintableInvoice = forwardRef<HTMLDivElement, PrintableInvoiceProps
           <div>
             <h4 className="font-semibold text-gray-900 mb-2">Payment Terms:</h4>
             <p className="text-sm text-gray-600">
-              Payment is due within 30 days of the invoice date. Late payments may be subject to a 1.5% monthly service charge.
+              IMPORTANT: Orders will only ship once invoices are paid in full. Be sure to complete your payment to prevent delays.
             </p>
           </div>
 

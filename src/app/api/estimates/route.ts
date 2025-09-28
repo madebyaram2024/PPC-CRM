@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getCurrentSessionUser } from "@/lib/auth";
+import { generateEstimateNumber } from "@/lib/utils";
 
 // For now, we'll use a simplified estimate structure
 // In a full implementation, you might want a separate Estimate model
@@ -96,7 +97,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate estimate number if not provided
-    const estimateNumber = number || `EST-${Date.now()}`;
+    const estimateNumber = number || await generateEstimateNumber();
 
     // Create estimate as an invoice with status "estimate"
     const estimate = await db.invoice.create({

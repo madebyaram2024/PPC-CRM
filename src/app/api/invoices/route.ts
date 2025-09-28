@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getCurrentSessionUser } from "@/lib/auth";
+import { generateInvoiceNumber } from "@/lib/utils";
 
 export async function GET(request: NextRequest) {
   try {
@@ -103,7 +104,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate invoice number if not provided
-    const invoiceNumber = number || `INV-${Date.now()}`;
+    const invoiceNumber = number || await generateInvoiceNumber();
 
     const invoice = await db.invoice.create({
       data: {

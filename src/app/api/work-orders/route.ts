@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getCurrentSessionUser } from "@/lib/auth";
+import { generateWorkOrderNumber } from "@/lib/utils";
 
 export async function GET(request: NextRequest) {
   try {
@@ -132,7 +133,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate work order number if not provided
-    const workOrderNumber = number || `WO-${Date.now()}`;
+    const workOrderNumber = number || await generateWorkOrderNumber();
 
     // Check if invoice exists (if provided)
     let invoice: any = null;
