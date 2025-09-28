@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "nodemon --exec \"npx tsx server.ts\" --watch server.ts --watch src --ext ts,tsx,js,jsx 2>&1 | tee dev.log",
-    "build": "next build && npm run db:deploy",
+    "build": "next build",
     "start": "NODE_ENV=production tsx server.ts 2>&1 | tee server.log",
     "lint": "next lint",
     "db:push": "prisma db push",
@@ -12,8 +12,7 @@
     "db:migrate": "prisma migrate dev",
     "db:reset": "prisma migrate reset",
     "db:seed": "tsx prisma/seed/index.ts",
-    "db:deploy": "prisma migrate deploy && prisma generate && npm run db:seed",
-    "postinstall": "prisma generate"
+    "db:deploy": "prisma migrate deploy && prisma generate && npm run db:seed"
   },
   "prisma": {
     "seed": "tsx prisma/seed/index.ts"

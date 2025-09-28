@@ -7,17 +7,17 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
+# Copy prisma folder first (needed for postinstall)
+COPY prisma ./prisma
+
 # Install all dependencies (including dev dependencies for build)
-RUN npm ci
+RUN npm ci --only=production=false
 
 # Copy source code
 COPY . .
 
-# Generate Prisma client
-RUN npx prisma generate
-
-# Build the application
-RUN npm run build
+# Generate Prisma client and build the application
+RUN npx prisma generate && npm run build
 
 # Remove dev dependencies after build
 RUN npm prune --production
