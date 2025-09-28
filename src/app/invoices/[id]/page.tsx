@@ -25,6 +25,13 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { PrintableInvoice } from "@/components/printable-invoice";
+import {
   ArrowLeft,
   FileText,
   User,
@@ -126,6 +133,8 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
   const [updating, setUpdating] = useState(false);
   const [invoiceId, setInvoiceId] = useState<string>('');
   const [showVoidDialog, setShowVoidDialog] = useState(false);
+  const [showPrintDialog, setShowPrintDialog] = useState(false);
+  const printRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     params.then(p => setInvoiceId(p.id));
@@ -226,10 +235,40 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
   };
 
   const handlePrintInvoice = () => {
-    // Open the dedicated print page in a new tab
-    window.open(`/invoices/${invoiceId}/print`, '_blank');
+    setShowPrintDialog(true);
   };
 
+  const executePrint = () => {
+    if (printRef.current) {
+      const printWindow = window.open('', '_blank');
+      if (printWindow) {
+        printWindow.document.write(`
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <title>Invoice ${invoice?.number}</title>
+              <meta charset="utf-8">
+              <style>
+                body { margin: 0; padding: 20px; font-family: Arial, sans-serif; }
+                @media print {
+                  body { margin: 0; padding: 0; }
+                  .no-print { display: none !important; }
+                }
+              </style>
+            </head>
+            <body>
+              ${printRef.current.innerHTML}
+            </body>
+          </html>
+        `);
+        printWindow.document.close();
+        printWindow.focus();
+        printWindow.print();
+        printWindow.close();
+      }
+    }
+    setShowPrintDialog(false);
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -603,6 +642,31 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Print Preview Dialog */}
+      <Dialog open={showPrintDialog} onOpenChange={setShowPrintDialog}>
+        <DialogContent className="max-w-[95vw] max-h-[95vh] overflow-y-auto w-full">
+          <DialogHeader>
+            <DialogTitle>Print Preview - {invoice?.number}</DialogTitle>
+          </DialogHeader>
+
+          {invoice && (
+            <div className="space-y-4">
+              <PrintableInvoice ref={printRef} invoice={invoice} type="invoice" />
+
+              <div className="flex justify-end gap-2 pt-4 border-t no-print">
+                <Button variant="outline" onClick={() => setShowPrintDialog(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={executePrint}>
+                  <Printer className="mr-2 h-4 w-4" />
+                  Print
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
     </div>
   );
