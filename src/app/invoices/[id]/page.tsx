@@ -257,13 +257,53 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
   };
 
   const executePrint = () => {
-    // Close the dialog first to avoid printing it
+    if (printRef.current) {
+      const printWindow = window.open('', '_blank');
+      if (printWindow) {
+        const invoiceContent = printRef.current.innerHTML;
+        printWindow.document.write(`
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <title>Invoice ${invoice?.number}</title>
+              <meta charset="utf-8">
+              <style>
+                body {
+                  margin: 0;
+                  padding: 20px;
+                  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                  color: black;
+                  background: white;
+                }
+                .bg-gray-50 { background-color: #f9fafb !important; }
+                .bg-gray-100 { background-color: #f3f4f6 !important; }
+                .text-purple-600 { color: #9333ea !important; }
+                .text-red-500 { color: #ef4444 !important; }
+                .border-red-500 { border-color: #ef4444 !important; }
+                .text-gray-900 { color: #111827 !important; }
+                .text-gray-700 { color: #374151 !important; }
+                .text-gray-600 { color: #4b5563 !important; }
+                .text-gray-500 { color: #6b7280 !important; }
+                .border-gray-300 { border-color: #d1d5db !important; }
+                .border-gray-900 { border-color: #111827 !important; }
+                @media print {
+                  body { margin: 0; padding: 20px; }
+                  @page { margin: 0.5in; }
+                }
+              </style>
+            </head>
+            <body>
+              ${invoiceContent}
+            </body>
+          </html>
+        `);
+        printWindow.document.close();
+        printWindow.focus();
+        printWindow.print();
+        printWindow.close();
+      }
+    }
     setShowPrintDialog(false);
-
-    // Small delay to ensure dialog is closed
-    setTimeout(() => {
-      window.print();
-    }, 100);
   };
 
   const getStatusColor = (status: string) => {
@@ -666,59 +706,13 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
         </DialogContent>
       </Dialog>
 
-      {/* Custom CSS to force large dialog and print styles */}
+      {/* Custom CSS to force large dialog */}
       <style jsx global>{`
         [data-state="open"] .fixed.inset-0 > div:last-child {
           width: 95vw !important;
           height: 95vh !important;
           max-width: 95vw !important;
           max-height: 95vh !important;
-        }
-
-        @media print {
-          /* Hide everything except the invoice content */
-          body * {
-            visibility: hidden !important;
-          }
-
-          /* Show only the printable invoice */
-          .print-area, .print-area * {
-            visibility: visible !important;
-          }
-
-          /* Position the print area correctly */
-          .print-area {
-            position: absolute !important;
-            left: 0 !important;
-            top: 0 !important;
-            width: 100% !important;
-            margin: 0 !important;
-            padding: 0 !important;
-          }
-
-          /* Hide navigation, headers, dialogs, etc. */
-          .no-print,
-          header,
-          nav,
-          aside,
-          [role="dialog"],
-          [data-state="open"],
-          .fixed,
-          .absolute {
-            display: none !important;
-            visibility: hidden !important;
-          }
-
-          /* Reset page margins for printing */
-          @page {
-            margin: 0.5in;
-          }
-
-          body {
-            margin: 0 !important;
-            padding: 0 !important;
-            background: white !important;
-          }
         }
       `}</style>
 
