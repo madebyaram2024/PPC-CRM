@@ -239,8 +239,37 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
   };
 
   const executePrint = () => {
-    // Open the dedicated print page which shows exactly the same content
-    window.open(`/invoices/${invoiceId}/print`, '_blank');
+    if (printRef.current) {
+      const printWindow = window.open('', '_blank');
+      if (printWindow) {
+        printWindow.document.write(`
+          <html>
+            <head>
+              <title>Invoice ${invoice?.number}</title>
+              <style>
+                body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+                .bg-gray-50 { background-color: #f9fafb !important; }
+                .bg-gray-100 { background-color: #f3f4f6 !important; }
+                .text-purple-600 { color: #9333ea !important; }
+                .text-red-500 { color: #ef4444 !important; }
+                .border-red-500 { border-color: #ef4444 !important; }
+                @media print {
+                  .no-print { display: none !important; }
+                  body { margin: 0 !important; padding: 0 !important; }
+                }
+              </style>
+            </head>
+            <body>
+              ${printRef.current.innerHTML}
+            </body>
+          </html>
+        `);
+        printWindow.document.close();
+        printWindow.focus();
+        printWindow.print();
+        printWindow.close();
+      }
+    }
     setShowPrintDialog(false);
   };
 
