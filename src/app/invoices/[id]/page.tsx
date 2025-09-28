@@ -193,23 +193,41 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
 
   const createWorkOrder = async () => {
     try {
+      if (!invoice) return;
+
+      // Convert invoice line items to work order line items format
+      const lineItems = invoice.lineItems.map(item => ({
+        productId: item.product?.id || null,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+        totalPrice: item.totalPrice,
+        description: item.product?.name || item.description,
+      }));
+
       const response = await fetch('/api/work-orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          invoiceId: invoice?.id,
-          customerId: invoice?.customer.id,
-          number: `${invoice?.number}-WO-1`,
+          invoiceId: invoice.id,
+          customerId: invoice.customer.id,
+          number: `${invoice.number}-WO-1`,
+          customPrinted: hasCustomPrintedProducts,
+          lineItems: lineItems,
+          amount: invoice.amount,
         }),
       });
 
-      if (!response.ok) throw new Error("Failed to create work order");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to create work order");
+      }
 
       const workOrder = await response.json();
       toast.success("Work order created successfully!");
       router.push(`/work-orders/${workOrder.id}`);
     } catch (error) {
-      toast.error("Failed to create work order");
+      console.error("Create work order error:", error);
+      toast.error(error instanceof Error ? error.message : "Failed to create work order");
     }
   };
 
@@ -239,8 +257,13 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
   };
 
   const executePrint = () => {
-    window.print();
+    // Close the dialog first to avoid printing it
     setShowPrintDialog(false);
+
+    // Small delay to ensure dialog is closed
+    setTimeout(() => {
+      window.print();
+    }, 100);
   };
 
   const getStatusColor = (status: string) => {
@@ -653,20 +676,48 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
         }
 
         @media print {
+          /* Hide everything except the invoice content */
           body * {
-            visibility: hidden;
+            visibility: hidden !important;
           }
+
+          /* Show only the printable invoice */
           .print-area, .print-area * {
-            visibility: visible;
+            visibility: visible !important;
           }
+
+          /* Position the print area correctly */
           .print-area {
             position: absolute !important;
             left: 0 !important;
             top: 0 !important;
             width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
           }
-          .no-print {
+
+          /* Hide navigation, headers, dialogs, etc. */
+          .no-print,
+          header,
+          nav,
+          aside,
+          [role="dialog"],
+          [data-state="open"],
+          .fixed,
+          .absolute {
             display: none !important;
+            visibility: hidden !important;
+          }
+
+          /* Reset page margins for printing */
+          @page {
+            margin: 0.5in;
+          }
+
+          body {
+            margin: 0 !important;
+            padding: 0 !important;
+            background: white !important;
           }
         }
       `}</style>
