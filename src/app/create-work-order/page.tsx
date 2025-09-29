@@ -254,7 +254,6 @@ export default function CreateWorkOrderPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          number: workOrderNumber,
           customerId: formData.customerId,
           invoiceId: (formData.invoiceId && formData.invoiceId !== "none") ? formData.invoiceId : null,
           customPrinted: hasCustomPrintedProducts,

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getCurrentSessionUser } from "@/lib/auth";
+import { generateInvoiceNumber, generateEstimateNumber } from "@/lib/utils";
 
 export async function GET(request: NextRequest) {
   try {
@@ -75,8 +76,10 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Generate invoice number
-    const invoiceNumber = `${type === "invoice" ? "INV" : "EST"}-${Date.now()}`;
+    // Generate proper sequential invoice or estimate number
+    const invoiceNumber = type === "invoice" 
+      ? await generateInvoiceNumber()
+      : await generateEstimateNumber();
 
     const document = await db.invoice.create({
       data: {

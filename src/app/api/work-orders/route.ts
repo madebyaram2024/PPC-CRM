@@ -25,7 +25,12 @@ export async function GET(request: NextRequest) {
     }
     
     if (status && status !== "all") {
-      where.status = status;
+      if (status === "active") {
+        // "active" means non-completed work orders
+        where.status = { not: "completed" };
+      } else {
+        where.status = status;
+      }
     }
 
     const workOrders = await db.workOrder.findMany({

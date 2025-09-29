@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getCurrentSessionUser } from "@/lib/auth";
+import { canMarkInvoicePaid } from "@/lib/roles";
 
 export async function GET(
   request: NextRequest,
@@ -122,6 +123,14 @@ export async function PATCH(
     const body = await request.json();
     const { status, amount, dueDate, notes } = body;
 
+    // Check if trying to mark as paid
+    if (status === 'paid') {
+      const canMarkPaid = await canMarkInvoicePaid();
+      if (!canMarkPaid) {
+        return NextResponse.json({ error: 'Only managers and admins can mark invoices as paid' }, { status: 403 });
+      }
+    }
+
     // Handle user ID - if it's the fallback admin, find the real admin user
     let actualUserId = user.id;
     if (user.id === 'admin-user-id') {
@@ -187,6 +196,9 @@ export async function PATCH(
         if (status === 'void') {
           activityType = "invoice_voided";
           description = `Voided invoice ${invoice.number}`;
+        } else if (status === 'paid') {
+          activityType = "invoice_paid";
+          description = `Marked invoice ${invoice.number} as paid`;
         }
 
         await db.activity.create({

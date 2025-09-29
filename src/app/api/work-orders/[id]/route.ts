@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getCurrentSessionUser } from "@/lib/auth";
+import { canMarkWorkOrderOkToShip } from "@/lib/roles";
 
 export async function GET(
   request: NextRequest,
@@ -100,7 +101,9 @@ export async function PATCH(
       productionCompleted,
       productionPhoto,
       shippedCompleted,
-      shippedPhoto
+      shippedPhoto,
+      // Add OK to ship status
+      okToShip
     } = body;
 
     // Check if work order exists
@@ -122,6 +125,18 @@ export async function PATCH(
     if (productionPhoto !== undefined) updateData.productionPhoto = productionPhoto;
     if (shippedCompleted !== undefined) updateData.shippedCompleted = shippedCompleted;
     if (shippedPhoto !== undefined) updateData.shippedPhoto = shippedPhoto;
+    
+    // Add OK to ship status if provided
+    if (okToShip !== undefined) {
+      // Check if user can mark as OK TO SHIP
+      const canMarkOkToShip = await canMarkWorkOrderOkToShip(params.id);
+      if (!canMarkOkToShip) {
+        return NextResponse.json({ error: 'Insufficient privileges to mark work order as OK TO SHIP' }, { status: 403 });
+      }
+      
+      // Add special field for OK to ship status (could be a separate status or flag)
+      updateData.okToShip = okToShip;
+    }
 
     // Only auto-update status if not manually setting status and not voided
     if (status === undefined && existingWorkOrder.status !== "void") {
@@ -157,9 +172,43 @@ export async function PATCH(
               select: {
                 name: true,
                 email: true,
+                phone: true,
+              }
+            },
+            lineItems: {
+              include: {
+                product: {
+                  select: {
+                    name: true,
+                    customPrinted: true,
+                  }
+                }
               }
             }
           }
+        },
+        user: {
+          select: {
+            name: true,
+            email: true,
+          }
+        },
+        documents: {
+          select: {
+            id: true,
+            filename: true,
+            originalName: true,
+            mimeType: true,
+            size: true,
+            createdAt: true,
+            user: {
+              select: {
+                name: true,
+                email: true,
+              }
+            }
+          },
+          orderBy: { createdAt: "desc" }
         }
       }
     });

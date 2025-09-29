@@ -64,7 +64,7 @@ export default function WorkOrdersPage() {
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("active");
 
   useEffect(() => {
     if (userLoading) return;
@@ -80,7 +80,17 @@ export default function WorkOrdersPage() {
       setLoading(true);
       const params = new URLSearchParams();
       if (searchTerm) params.append("search", searchTerm);
-      if (statusFilter !== "all") params.append("status", statusFilter);
+      
+      // Apply status filter based on current selection
+      if (statusFilter === "all") {
+        // If "all" is selected from dropdown, don't apply status filter (show all)
+        // This means we don't add a status parameter to the URL
+      } else if (statusFilter === "active") {
+        // "active" means non-completed work orders
+        params.append("status", "active");
+      } else if (statusFilter) {
+        params.append("status", statusFilter);
+      }
 
       const response = await fetch(`/api/work-orders?${params}`);
       if (!response.ok) throw new Error("Failed to fetch work orders");
@@ -158,15 +168,38 @@ export default function WorkOrdersPage() {
     <div className="p-6 space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Work Orders</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            {statusFilter === "completed" ? "Completed Work Orders" : "Work Orders"}
+          </h1>
           <p className="text-muted-foreground">
-            Manage production workflow and track order progress
+            {statusFilter === "completed" 
+              ? "View completed production orders" 
+              : "Manage production workflow and track order progress"}
           </p>
         </div>
-        <Button onClick={() => router.push('/create-work-order')}>
-          <Plus className="mr-2 h-4 w-4" />
-          Create Work Order
-        </Button>
+        <div className="flex gap-2">
+          {statusFilter === "completed" ? (
+            <Button variant="outline" onClick={() => {
+              setStatusFilter("all");
+              setSearchTerm("");
+            }}>
+              <Clock className="mr-2 h-4 w-4" />
+              Active Orders
+            </Button>
+          ) : (
+            <Button variant="outline" onClick={() => {
+              setStatusFilter("completed");
+              setSearchTerm("");
+            }}>
+              <CheckCircle className="mr-2 h-4 w-4" />
+              Completed Orders
+            </Button>
+          )}
+          <Button onClick={() => router.push('/create-work-order')}>
+            <Plus className="mr-2 h-4 w-4" />
+            Create Work Order
+          </Button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -182,9 +215,10 @@ export default function WorkOrdersPage() {
         </div>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
           <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="All Statuses" />
+            <SelectValue placeholder="Active Orders" />
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="active">Active Orders</SelectItem>
             <SelectItem value="all">All Statuses</SelectItem>
             <SelectItem value="pending">Pending</SelectItem>
             <SelectItem value="in_progress">In Progress</SelectItem>
