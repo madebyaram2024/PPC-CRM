@@ -25,7 +25,14 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   public componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    // Log error to console for development
     console.error("Uncaught error:", error, errorInfo);
+
+    // In production, you could send this to an error tracking service
+    if (process.env.NODE_ENV === 'production') {
+      // Example: Send to error tracking service
+      // errorTrackingService.captureException(error, { errorInfo });
+    }
   }
 
   private handleRetry = () => {

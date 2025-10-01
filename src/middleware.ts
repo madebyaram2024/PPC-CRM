@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getSessionUserFromRequest } from './lib/auth';
+import { canAccessUserManagement, canAccessCompanySettings } from './lib/roles';
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -8,12 +10,6 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Define admin-only routes
-  const adminRoutes = ['/settings', '/users'];
-  
-  // Check if current path is an admin route
-  const isAdminRoute = adminRoutes.some(route => pathname.startsWith(route));
-
   // For all protected routes, check if user is authenticated
   const sessionCookie = request.cookies.get('session');
   if (!sessionCookie) {
@@ -21,18 +17,31 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  // If accessing admin routes, check for admin access
-  if (isAdminRoute) {
-    // If the session value matches our admin ID, allow access
-    if (sessionCookie.value === 'admin-user-id') {
-      return NextResponse.next();
-    }
-
-    // For any other route (including customer management, invoices, etc.), allow any authenticated user
-    return NextResponse.next();
+  // Get the current user from the request
+  const user = await getSessionUserFromRequest(request);
+  if (!user) {
+    console.log('No user found in session, redirecting to login');
+    return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  // Allow any authenticated user for non-admin routes
+  // Check specific route permissions
+  if (pathname.startsWith('/users')) {
+    const canAccess = await canAccessUserManagement();
+    if (!canAccess) {
+      console.log('User does not have permission to access user management');
+      return NextResponse.redirect(new URL('/', request.url));
+    }
+  }
+
+  if (pathname.startsWith('/settings')) {
+    const canAccess = await canAccessCompanySettings();
+    if (!canAccess) {
+      console.log('User does not have permission to access company settings');
+      return NextResponse.redirect(new URL('/', request.url));
+    }
+  }
+
+  // All other authenticated routes are accessible
   return NextResponse.next();
 }
 

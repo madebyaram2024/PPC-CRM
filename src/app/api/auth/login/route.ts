@@ -1,8 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import bcrypt from 'bcryptjs';
+import { checkRateLimit, getClientIdentifier, RateLimitPresets } from '@/lib/rate-limit';
 
 export async function POST(request: NextRequest) {
+  // Apply rate limiting for login attempts
+  const identifier = getClientIdentifier(request);
+  const rateLimit = checkRateLimit(identifier, RateLimitPresets.AUTH);
+
+  if (!rateLimit.success) {
+    return NextResponse.json(
+      { error: rateLimit.message },
+      {
+        status: 429,
+        headers: {
+          'X-RateLimit-Limit': String(rateLimit.limit),
+          'X-RateLimit-Remaining': String(rateLimit.remaining),
+          'X-RateLimit-Reset': String(rateLimit.resetTime),
+        },
+      }
+    );
+  }
+
   try {
     const { email, password } = await request.json();
 

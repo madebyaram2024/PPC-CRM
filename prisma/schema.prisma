@@ -9,7 +9,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "sqlite" // Switch to "postgresql" for production
   url      = env("DATABASE_URL")
 }
 
@@ -21,13 +21,16 @@ model User {
   role      String   @default("user")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
+
   // Relations
   customers          Customer[]
   invoices           Invoice[]
   activities         Activity[]
   workOrders         WorkOrder[]
   workOrderDocuments WorkOrderDocument[]
+
+  @@index([email])
+  @@index([role])
 }
 
 model Company {
@@ -74,6 +77,11 @@ model Customer {
   company   Company  @relation(fields: [companyId], references: [id])
   invoices  Invoice[]
   activities Activity[]
+
+  @@index([userId])
+  @@index([companyId])
+  @@index([status])
+  @@index([email])
 }
 
 model Product {
@@ -87,10 +95,14 @@ model Product {
   customPrinted Boolean  @default(false) // New field for custom printed products
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
-  
+
   // Relations
   lineItems           LineItem[]
   workOrderLineItems  WorkOrderLineItem[]
+
+  @@index([sku])
+  @@index([category])
+  @@index([isActive])
 }
 
 model Invoice {
@@ -101,7 +113,7 @@ model Invoice {
   dueDate     DateTime
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  
+
   // Relations
   customerId  String
   customer    Customer @relation(fields: [customerId], references: [id])
@@ -112,6 +124,13 @@ model Invoice {
   lineItems   LineItem[]
   activities  Activity[]
   workOrders  WorkOrder[]
+
+  @@index([customerId])
+  @@index([companyId])
+  @@index([userId])
+  @@index([status])
+  @@index([number])
+  @@index([dueDate])
 }
 
 model WorkOrderDocument {
@@ -165,9 +184,10 @@ model WorkOrder {
   number        String   @unique
   status        String   @default("pending") // "pending", "in_progress", "completed", "void"
   customPrinted Boolean  @default(false)
+  okToShip      Boolean  @default(false) // Ready to ship status
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
-  
+
   // Status tracking
   printedCompleted    Boolean @default(false)
   printedPhoto        String?
@@ -175,7 +195,7 @@ model WorkOrder {
   productionPhoto     String?
   shippedCompleted    Boolean @default(false)
   shippedPhoto        String?
-  
+
   // Relations
   invoiceId String?
   invoice   Invoice? @relation(fields: [invoiceId], references: [id])
@@ -183,10 +203,17 @@ model WorkOrder {
   company   Company  @relation(fields: [companyId], references: [id])
   userId    String
   user      User     @relation(fields: [userId], references: [id])
-  
+
   // File uploads
   documents WorkOrderDocument[]
   lineItems WorkOrderLineItem[]
+
+  @@index([number])
+  @@index([status])
+  @@index([companyId])
+  @@index([userId])
+  @@index([invoiceId])
+  @@index([okToShip])
 }
 
 model WorkOrderLineItem {

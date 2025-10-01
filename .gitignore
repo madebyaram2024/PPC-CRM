@@ -52,3 +52,12 @@ server.log
 prisma/prod.db
 prisma/dev.db
 *.db
+
+# Test files and uploads
+test-*.txt
+test-*.pdf
+test.pdf
+auth_test_cookies.txt
+auth_token.txt
+/uploads/*
+!/uploads/.gitkeep

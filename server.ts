@@ -1,8 +1,18 @@
 // server.ts - Next.js Standalone + Socket.IO
 import { setupSocket } from '@/lib/socket';
+import { validateEnv } from '@/lib/env';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import next from 'next';
+
+// Validate environment variables before starting
+try {
+  validateEnv();
+  console.log('✓ Environment variables validated');
+} catch (error) {
+  console.error('❌ Environment validation failed:', error instanceof Error ? error.message : error);
+  process.exit(1);
+}
 
 const dev = process.env.NODE_ENV !== 'production';
 const currentPort = parseInt(process.env.PORT || '3400', 10);
@@ -31,13 +41,17 @@ async function createCustomServer() {
       handle(req, res);
     });
 
-    // Setup Socket.IO
+    // Setup Socket.IO with enhanced configuration
     const io = new Server(server, {
       path: '/api/socketio',
       cors: {
-        origin: "*",
-        methods: ["GET", "POST"]
-      }
+        origin: process.env.NEXTAUTH_URL || (dev ? "http://localhost:3400" : false),
+        methods: ["GET", "POST"],
+        credentials: true
+      },
+      // Add additional options for better real-time performance
+      transports: ['websocket', 'polling'],
+      allowEIO3: true
     });
 
     setupSocket(io);
