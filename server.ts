@@ -1,4 +1,5 @@
 // server.ts - Next.js Standalone + Socket.IO
+import 'dotenv/config';
 import { setupSocket } from '@/lib/socket';
 import { validateEnv } from '@/lib/env';
 import { createServer } from 'http';
