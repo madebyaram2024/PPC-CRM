@@ -119,7 +119,7 @@ async function main() {
     create: {
       name: '8oz Paper Cups - 25 Count',
       description: 'Standard 8oz paper cup with custom logo printing - 25 count',
-      price: 5.00,
+      price: 50.00,
       sku: '8OZ-25',
       category: 'Paper Cups',
       isActive: true,
@@ -198,7 +198,7 @@ async function main() {
     create: {
       name: '10oz Paper Cups - 25 Count',
       description: 'Medium 10oz paper cup with custom logo printing - 25 count',
-      price: 5.00,
+      price: 50.00,
       sku: '10OZ-25',
       category: 'Paper Cups',
       isActive: true,
@@ -277,7 +277,7 @@ async function main() {
     create: {
       name: '12oz Paper Cups - 25 Count',
       description: 'Large 12oz paper cup with custom logo printing - 25 count',
-      price: 5.00,
+      price: 50.00,
       sku: '12OZ-25',
       category: 'Paper Cups',
       isActive: true,
