@@ -10,11 +10,14 @@ export async function PUT(
     const body = await request.json();
     const { name, description, price, sku, category, isActive, customPrinted } = body;
 
+    // Convert empty strings to null for unique fields
+    const cleanSku = sku?.trim() || null;
+
     // Check if SKU already exists (excluding current product)
-    if (sku) {
+    if (cleanSku) {
       const existingProduct = await db.product.findFirst({
-        where: { 
-          sku, 
+        where: {
+          sku: cleanSku,
           NOT: { id: params.id }
         }
       });
@@ -31,10 +34,10 @@ export async function PUT(
       where: { id: params.id },
       data: {
         name,
-        description,
+        description: description?.trim() || null,
         price: price ? parseFloat(price) : undefined,
-        sku,
-        category,
+        sku: cleanSku,
+        category: category?.trim() || null,
         isActive: isActive !== undefined ? isActive : undefined,
         customPrinted: customPrinted !== undefined ? customPrinted : undefined,
       },

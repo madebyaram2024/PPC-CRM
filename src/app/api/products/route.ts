@@ -66,10 +66,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Convert empty strings to null for unique fields
+    const cleanSku = sku?.trim() || null;
+
     // Check if SKU already exists (if provided)
-    if (sku) {
+    if (cleanSku) {
       const existingSku = await db.product.findUnique({
-        where: { sku }
+        where: { sku: cleanSku }
       });
       if (existingSku) {
         return NextResponse.json(
@@ -82,10 +85,10 @@ export async function POST(request: NextRequest) {
     const product = await db.product.create({
       data: {
         name,
-        description,
+        description: description?.trim() || null,
         price: parseFloat(price),
-        sku,
-        category,
+        sku: cleanSku,
+        category: category?.trim() || null,
         customPrinted: customPrinted !== undefined ? customPrinted : true,
         isActive: true,
       }
