@@ -110,39 +110,252 @@ async function main() {
     },
   });
 
-  // Create demo products
-  const product1 = await prisma.product.upsert({
-    where: { sku: 'PPC-8OZ' },
+  // Create cup products for different sizes and quantities
+
+  // 8oz Cups
+  await prisma.product.upsert({
+    where: { sku: '8OZ-25' },
     update: {},
     create: {
-      name: '8oz Paper Cup',
-      description: 'Standard 8oz paper cup with custom logo printing',
-      price: 0.15,
-      sku: 'PPC-8OZ',
+      name: '8oz Paper Cups - 25 Count',
+      description: 'Standard 8oz paper cup with custom logo printing - 25 count',
+      price: 5.00,
+      sku: '8OZ-25',
       category: 'Paper Cups',
       isActive: true,
     },
   });
 
-  const product2 = await prisma.product.upsert({
-    where: { sku: 'PPC-12OZ' },
+  await prisma.product.upsert({
+    where: { sku: '8OZ-100' },
     update: {},
     create: {
-      name: '12oz Paper Cup',
-      description: 'Large 12oz paper cup with custom logo printing',
-      price: 0.20,
-      sku: 'PPC-12OZ',
+      name: '8oz Paper Cups - 100 Count',
+      description: 'Standard 8oz paper cup with custom logo printing - 100 count',
+      price: 100.00,
+      sku: '8OZ-100',
       category: 'Paper Cups',
       isActive: true,
     },
   });
 
-  const product3 = await prisma.product.upsert({
+  await prisma.product.upsert({
+    where: { sku: '8OZ-500' },
+    update: {},
+    create: {
+      name: '8oz Paper Cups - 500 Count',
+      description: 'Standard 8oz paper cup with custom logo printing - 500 count',
+      price: 250.00,
+      sku: '8OZ-500',
+      category: 'Paper Cups',
+      isActive: true,
+    },
+  });
+
+  await prisma.product.upsert({
+    where: { sku: '8OZ-1000' },
+    update: {},
+    create: {
+      name: '8oz Paper Cups - 1000 Count',
+      description: 'Standard 8oz paper cup with custom logo printing - 1000 count',
+      price: 350.00,
+      sku: '8OZ-1000',
+      category: 'Paper Cups',
+      isActive: true,
+    },
+  });
+
+  await prisma.product.upsert({
+    where: { sku: '8OZ-5000' },
+    update: {},
+    create: {
+      name: '8oz Paper Cups - 5000 Count',
+      description: 'Standard 8oz paper cup with custom logo printing - 5000 count',
+      price: 750.00,
+      sku: '8OZ-5000',
+      category: 'Paper Cups',
+      isActive: true,
+    },
+  });
+
+  await prisma.product.upsert({
+    where: { sku: '8OZ-10000' },
+    update: {},
+    create: {
+      name: '8oz Paper Cups - 10000 Count',
+      description: 'Standard 8oz paper cup with custom logo printing - 10000 count',
+      price: 1000.00,
+      sku: '8OZ-10000',
+      category: 'Paper Cups',
+      isActive: true,
+    },
+  });
+
+  // 10oz Cups
+  await prisma.product.upsert({
+    where: { sku: '10OZ-25' },
+    update: {},
+    create: {
+      name: '10oz Paper Cups - 25 Count',
+      description: 'Medium 10oz paper cup with custom logo printing - 25 count',
+      price: 5.00,
+      sku: '10OZ-25',
+      category: 'Paper Cups',
+      isActive: true,
+    },
+  });
+
+  await prisma.product.upsert({
+    where: { sku: '10OZ-100' },
+    update: {},
+    create: {
+      name: '10oz Paper Cups - 100 Count',
+      description: 'Medium 10oz paper cup with custom logo printing - 100 count',
+      price: 100.00,
+      sku: '10OZ-100',
+      category: 'Paper Cups',
+      isActive: true,
+    },
+  });
+
+  await prisma.product.upsert({
+    where: { sku: '10OZ-500' },
+    update: {},
+    create: {
+      name: '10oz Paper Cups - 500 Count',
+      description: 'Medium 10oz paper cup with custom logo printing - 500 count',
+      price: 250.00,
+      sku: '10OZ-500',
+      category: 'Paper Cups',
+      isActive: true,
+    },
+  });
+
+  await prisma.product.upsert({
+    where: { sku: '10OZ-1000' },
+    update: {},
+    create: {
+      name: '10oz Paper Cups - 1000 Count',
+      description: 'Medium 10oz paper cup with custom logo printing - 1000 count',
+      price: 350.00,
+      sku: '10OZ-1000',
+      category: 'Paper Cups',
+      isActive: true,
+    },
+  });
+
+  await prisma.product.upsert({
+    where: { sku: '10OZ-5000' },
+    update: {},
+    create: {
+      name: '10oz Paper Cups - 5000 Count',
+      description: 'Medium 10oz paper cup with custom logo printing - 5000 count',
+      price: 750.00,
+      sku: '10OZ-5000',
+      category: 'Paper Cups',
+      isActive: true,
+    },
+  });
+
+  await prisma.product.upsert({
+    where: { sku: '10OZ-10000' },
+    update: {},
+    create: {
+      name: '10oz Paper Cups - 10000 Count',
+      description: 'Medium 10oz paper cup with custom logo printing - 10000 count',
+      price: 1000.00,
+      sku: '10OZ-10000',
+      category: 'Paper Cups',
+      isActive: true,
+    },
+  });
+
+  // 12oz Cups
+  await prisma.product.upsert({
+    where: { sku: '12OZ-25' },
+    update: {},
+    create: {
+      name: '12oz Paper Cups - 25 Count',
+      description: 'Large 12oz paper cup with custom logo printing - 25 count',
+      price: 5.00,
+      sku: '12OZ-25',
+      category: 'Paper Cups',
+      isActive: true,
+    },
+  });
+
+  await prisma.product.upsert({
+    where: { sku: '12OZ-100' },
+    update: {},
+    create: {
+      name: '12oz Paper Cups - 100 Count',
+      description: 'Large 12oz paper cup with custom logo printing - 100 count',
+      price: 100.00,
+      sku: '12OZ-100',
+      category: 'Paper Cups',
+      isActive: true,
+    },
+  });
+
+  await prisma.product.upsert({
+    where: { sku: '12OZ-500' },
+    update: {},
+    create: {
+      name: '12oz Paper Cups - 500 Count',
+      description: 'Large 12oz paper cup with custom logo printing - 500 count',
+      price: 250.00,
+      sku: '12OZ-500',
+      category: 'Paper Cups',
+      isActive: true,
+    },
+  });
+
+  await prisma.product.upsert({
+    where: { sku: '12OZ-1000' },
+    update: {},
+    create: {
+      name: '12oz Paper Cups - 1000 Count',
+      description: 'Large 12oz paper cup with custom logo printing - 1000 count',
+      price: 350.00,
+      sku: '12OZ-1000',
+      category: 'Paper Cups',
+      isActive: true,
+    },
+  });
+
+  await prisma.product.upsert({
+    where: { sku: '12OZ-5000' },
+    update: {},
+    create: {
+      name: '12oz Paper Cups - 5000 Count',
+      description: 'Large 12oz paper cup with custom logo printing - 5000 count',
+      price: 750.00,
+      sku: '12OZ-5000',
+      category: 'Paper Cups',
+      isActive: true,
+    },
+  });
+
+  await prisma.product.upsert({
+    where: { sku: '12OZ-10000' },
+    update: {},
+    create: {
+      name: '12oz Paper Cups - 10000 Count',
+      description: 'Large 12oz paper cup with custom logo printing - 10000 count',
+      price: 1000.00,
+      sku: '12OZ-10000',
+      category: 'Paper Cups',
+      isActive: true,
+    },
+  });
+
+  // Keep lid product
+  await prisma.product.upsert({
     where: { sku: 'PPC-LID' },
     update: {},
     create: {
       name: 'Paper Cup Lid',
-      description: 'Fits 8oz and 12oz paper cups',
+      description: 'Fits 8oz, 10oz and 12oz paper cups',
       price: 0.05,
       sku: 'PPC-LID',
       category: 'Lids',
