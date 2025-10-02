@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getCurrentSessionUser } from "@/lib/auth";
 import { generateWorkOrderNumber } from "@/lib/utils";
+import { notifyWorkOrderCreated } from "@/lib/socket-server";
 
 export async function GET(request: NextRequest) {
   try {
@@ -246,6 +247,13 @@ export async function POST(request: NextRequest) {
       });
     } catch (activityError) {
       console.error("Failed to create activity:", activityError);
+    }
+
+    // Send real-time notification
+    try {
+      notifyWorkOrderCreated(completeWorkOrder);
+    } catch (notificationError) {
+      console.error("Failed to send notification:", notificationError);
     }
 
     return NextResponse.json(completeWorkOrder, { status: 201 });

@@ -69,16 +69,16 @@ async function main() {
   const company = await prisma.company.upsert({
     where: { id: 'default-company' },
     update: {
-      name: 'Pacific Paper Cups',
-      email: 'info@pacificpapercups.com',
+      name: 'US PAPER CUP FACTORY',
+      email: 'info@uspapercupfactory.com',
       phone: '818.355.0103',
       address: '11183 Condor Ave, Huntington Beach, CA 92708',
       logo: '/logo.png', // Using the logo.png file from public folder
     },
     create: {
       id: 'default-company',
-      name: 'Pacific Paper Cups',
-      email: 'info@pacificpapercups.com',
+      name: 'US PAPER CUP FACTORY',
+      email: 'info@uspapercupfactory.com',
       phone: '818.355.0103',
       address: '11183 Condor Ave, Huntington Beach, CA 92708',
       logo: '/logo.png', // Using the logo.png file from public folder

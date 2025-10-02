@@ -14,6 +14,7 @@ import {
   Package,
   User,
   Clipboard,
+  MessageSquare,
 } from "lucide-react";
 
 const navigation = [
@@ -60,6 +61,12 @@ const navigation = [
     permission: "view_dashboard", // All authenticated users can view work orders
   },
   {
+    name: "Messenger",
+    href: "/messenger",
+    icon: MessageSquare,
+    permission: "view_dashboard", // All users can access messenger
+  },
+  {
     name: "Profile",
     href: "/profile",
     icon: User,
@@ -94,11 +101,11 @@ export function NavigationSidebar() {
             <div className="relative w-8 h-8">
               <img
                 src="/logo.png"
-                alt="Pacific Paper Cups Logo"
+                alt="US PAPER CUP FACTORY Logo"
                 className="w-full h-full object-contain"
               />
             </div>
-            <span className="text-lg font-semibold">Pacific Paper Cups</span>
+            <span className="text-lg font-semibold">US PAPER CUP FACTORY</span>
           </div>
         </div>
         <div className="flex-1 px-3 py-4 flex items-center justify-center">

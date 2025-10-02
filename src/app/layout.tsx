@@ -7,6 +7,7 @@ import { UserProvider } from "@/contexts/user-context";
 import { AuthGuard } from "@/components/auth-guard";
 import { AppLayout } from "@/components/app-layout";
 import { ConsoleFilter } from "@/components/console-filter";
+import { NotificationsProvider } from "@/components/notifications-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -19,12 +20,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Pacific Paper Cups - Business Management System",
-  description: "Modern business management system for Pacific Paper Cups with customer management, invoicing, and document creation.",
-  keywords: ["Pacific Paper Cups", "business", "management", "dashboard", "customers", "invoices"],
-  authors: [{ name: "Pacific Paper Cups Team" }],
+  title: "US PAPER CUP FACTORY - Business Management System",
+  description: "Modern business management system for US PAPER CUP FACTORY with customer management, invoicing, and document creation.",
+  keywords: ["US PAPER CUP FACTORY", "business", "management", "dashboard", "customers", "invoices"],
+  authors: [{ name: "US PAPER CUP FACTORY Team" }],
   openGraph: {
-    title: "Pacific Paper Cups",
+    title: "US PAPER CUP FACTORY",
     description: "Business Management System",
     type: "website",
   },
@@ -49,9 +50,11 @@ export default function RootLayout({
           <ConsoleFilter />
           <UserProvider>
             <AuthGuard>
-              <AppLayout>
-                {children}
-              </AppLayout>
+              <NotificationsProvider>
+                <AppLayout>
+                  {children}
+                </AppLayout>
+              </NotificationsProvider>
             </AuthGuard>
           </UserProvider>
           <Toaster />

@@ -16,8 +16,8 @@ export async function GET(request: NextRequest) {
     if (!company) {
       company = await db.company.create({
         data: {
-          name: "Pacific Paper Cups",
-          email: "contact@pacificpapercups.com",
+          name: "US PAPER CUP FACTORY",
+          email: "contact@uspapercupfactory.com",
           phone: "+1 (555) 123-4567",
           address: "123 Paper Street, Cup City, PC 12345",
         }

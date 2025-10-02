@@ -67,7 +67,7 @@ export default function LoginPage() {
             </div>
           </div>
           <CardTitle className="text-2xl text-center">
-            Pacific Paper Cups
+            US PAPER CUP FACTORY
           </CardTitle>
           <CardDescription className="text-center">
             Enter your credentials to access the system

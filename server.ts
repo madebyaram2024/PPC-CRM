@@ -1,6 +1,7 @@
 // server.ts - Next.js Standalone + Socket.IO
 import 'dotenv/config';
 import { setupSocket } from '@/lib/socket';
+import { setSocketServer } from '@/lib/socket-server';
 import { validateEnv } from '@/lib/env';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
@@ -56,6 +57,7 @@ async function createCustomServer() {
     });
 
     setupSocket(io);
+    setSocketServer(io);
 
     // Start the server
     server.listen(currentPort, hostname, () => {
