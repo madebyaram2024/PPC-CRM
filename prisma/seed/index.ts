@@ -13,12 +13,12 @@ async function main() {
 
   // Create admin user
   const adminUser = await prisma.user.upsert({
-    where: { email: 'admin@pacificpapercups.com' },
+    where: { email: 'admin@uspapercupfactory.com' },
     update: {
       password: adminPassword,
     },
     create: {
-      email: 'admin@pacificpapercups.com',
+      email: 'admin@uspapercupfactory.com',
       name: 'Admin',
       password: adminPassword,
       role: 'admin',
@@ -27,12 +27,12 @@ async function main() {
 
   // Create the three specified users: Vick, Art, Lilit
   const vickUser = await prisma.user.upsert({
-    where: { email: 'vick@pacificpapercups.com' },
+    where: { email: 'vick@uspapercupfactory.com' },
     update: {
       password: defaultUserPassword,
     },
     create: {
-      email: 'vick@pacificpapercups.com',
+      email: 'vick@uspapercupfactory.com',
       name: 'Vick',
       password: defaultUserPassword,
       role: 'user',
@@ -40,12 +40,12 @@ async function main() {
   });
 
   const artUser = await prisma.user.upsert({
-    where: { email: 'art@pacificpapercups.com' },
+    where: { email: 'art@uspapercupfactory.com' },
     update: {
       password: defaultUserPassword,
     },
     create: {
-      email: 'art@pacificpapercups.com',
+      email: 'art@uspapercupfactory.com',
       name: 'Art',
       password: defaultUserPassword,
       role: 'user',
@@ -53,12 +53,12 @@ async function main() {
   });
 
   const lilitUser = await prisma.user.upsert({
-    where: { email: 'lilit@pacificpapercups.com' },
+    where: { email: 'lilit@uspapercupfactory.com' },
     update: {
       password: defaultUserPassword,
     },
     create: {
-      email: 'lilit@pacificpapercups.com',
+      email: 'lilit@uspapercupfactory.com',
       name: 'Lilit',
       password: defaultUserPassword,
       role: 'user',
@@ -365,10 +365,10 @@ async function main() {
 
   console.log('Database seeded successfully!');
   console.log('Production users created:');
-  console.log('- Admin: admin@pacificpapercups.com / Password: admin123');
-  console.log('- Vick: vick@pacificpapercups.com / Password: default123');
-  console.log('- Art: art@pacificpapercups.com / Password: default123');
-  console.log('- Lilit: lilit@pacificcups.com / Password: default123');
+  console.log('- Admin: admin@uspapercupfactory.com / Password: admin123');
+  console.log('- Vick: vick@uspapercupfactory.com / Password: default123');
+  console.log('- Art: art@uspapercupfactory.com / Password: default123');
+  console.log('- Lilit: lilit@uspapercupfactory.com / Password: default123');
   console.log('IMPORTANT: Users should change default passwords after first login!');
 }
 
