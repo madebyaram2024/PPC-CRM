@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
         price: parseFloat(price),
         sku,
         category,
-        customPrinted: customPrinted || false,
+        customPrinted: customPrinted !== undefined ? customPrinted : true,
         isActive: true,
       }
     });

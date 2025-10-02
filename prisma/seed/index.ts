@@ -130,6 +130,7 @@ async function main() {
       price: 50.00,
       sku: '8OZ-25',
       category: 'Paper Cups',
+      customPrinted: true,
       isActive: true,
     },
   });
@@ -143,6 +144,7 @@ async function main() {
       price: 100.00,
       sku: '8OZ-100',
       category: 'Paper Cups',
+      customPrinted: true,
       isActive: true,
     },
   });
@@ -156,6 +158,7 @@ async function main() {
       price: 250.00,
       sku: '8OZ-500',
       category: 'Paper Cups',
+      customPrinted: true,
       isActive: true,
     },
   });
@@ -169,6 +172,7 @@ async function main() {
       price: 350.00,
       sku: '8OZ-1000',
       category: 'Paper Cups',
+      customPrinted: true,
       isActive: true,
     },
   });
@@ -182,6 +186,7 @@ async function main() {
       price: 750.00,
       sku: '8OZ-5000',
       category: 'Paper Cups',
+      customPrinted: true,
       isActive: true,
     },
   });
@@ -195,6 +200,7 @@ async function main() {
       price: 1000.00,
       sku: '8OZ-10000',
       category: 'Paper Cups',
+      customPrinted: true,
       isActive: true,
     },
   });
@@ -209,6 +215,7 @@ async function main() {
       price: 50.00,
       sku: '10OZ-25',
       category: 'Paper Cups',
+      customPrinted: true,
       isActive: true,
     },
   });
@@ -222,6 +229,7 @@ async function main() {
       price: 100.00,
       sku: '10OZ-100',
       category: 'Paper Cups',
+      customPrinted: true,
       isActive: true,
     },
   });
@@ -235,6 +243,7 @@ async function main() {
       price: 250.00,
       sku: '10OZ-500',
       category: 'Paper Cups',
+      customPrinted: true,
       isActive: true,
     },
   });
@@ -248,6 +257,7 @@ async function main() {
       price: 350.00,
       sku: '10OZ-1000',
       category: 'Paper Cups',
+      customPrinted: true,
       isActive: true,
     },
   });
@@ -261,6 +271,7 @@ async function main() {
       price: 750.00,
       sku: '10OZ-5000',
       category: 'Paper Cups',
+      customPrinted: true,
       isActive: true,
     },
   });
@@ -274,6 +285,7 @@ async function main() {
       price: 1000.00,
       sku: '10OZ-10000',
       category: 'Paper Cups',
+      customPrinted: true,
       isActive: true,
     },
   });
@@ -288,6 +300,7 @@ async function main() {
       price: 50.00,
       sku: '12OZ-25',
       category: 'Paper Cups',
+      customPrinted: true,
       isActive: true,
     },
   });
@@ -301,6 +314,7 @@ async function main() {
       price: 100.00,
       sku: '12OZ-100',
       category: 'Paper Cups',
+      customPrinted: true,
       isActive: true,
     },
   });
@@ -314,6 +328,7 @@ async function main() {
       price: 250.00,
       sku: '12OZ-500',
       category: 'Paper Cups',
+      customPrinted: true,
       isActive: true,
     },
   });
@@ -327,6 +342,7 @@ async function main() {
       price: 350.00,
       sku: '12OZ-1000',
       category: 'Paper Cups',
+      customPrinted: true,
       isActive: true,
     },
   });
@@ -340,6 +356,7 @@ async function main() {
       price: 750.00,
       sku: '12OZ-5000',
       category: 'Paper Cups',
+      customPrinted: true,
       isActive: true,
     },
   });
@@ -353,6 +370,7 @@ async function main() {
       price: 1000.00,
       sku: '12OZ-10000',
       category: 'Paper Cups',
+      customPrinted: true,
       isActive: true,
     },
   });

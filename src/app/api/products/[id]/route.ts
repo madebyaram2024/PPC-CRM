@@ -8,7 +8,7 @@ export async function PUT(
   try {
     const params = await context.params;
     const body = await request.json();
-    const { name, description, price, sku, category, isActive } = body;
+    const { name, description, price, sku, category, isActive, customPrinted } = body;
 
     // Check if SKU already exists (excluding current product)
     if (sku) {
@@ -36,6 +36,7 @@ export async function PUT(
         sku,
         category,
         isActive: isActive !== undefined ? isActive : undefined,
+        customPrinted: customPrinted !== undefined ? customPrinted : undefined,
       },
     });
 
