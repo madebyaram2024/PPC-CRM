@@ -85,30 +85,38 @@ async function main() {
     },
   });
 
-  // Create demo customers
-  const customer1 = await prisma.customer.create({
-    data: {
-      name: 'ABC Restaurant',
-      email: 'orders@abcrestaurant.com',
-      phone: '+1 (555) 234-5678',
-      address: '456 Food Street, Dining City, DC 67890',
-      status: 'customer',
-      userId: adminUser.id,
-      companyId: company.id,
-    },
-  });
+  // Create demo customers (only if they don't exist)
+  const existingCustomers = await prisma.customer.findMany();
 
-  const customer2 = await prisma.customer.create({
-    data: {
-      name: 'XYZ Coffee Shop',
-      email: 'contact@xyzcoffee.com',
-      phone: '+1 (555) 345-6789',
-      address: '789 Coffee Lane, Brew City, BC 90123',
-      status: 'prospect',
-      userId: vickUser.id, // Assign to Vick
-      companyId: company.id,
-    },
-  });
+  if (existingCustomers.length === 0) {
+    await prisma.customer.create({
+      data: {
+        name: 'ABC Restaurant',
+        email: 'orders@abcrestaurant.com',
+        phone: '+1 (555) 234-5678',
+        address: '456 Food Street, Dining City, DC 67890',
+        status: 'customer',
+        userId: adminUser.id,
+        companyId: company.id,
+      },
+    });
+
+    await prisma.customer.create({
+      data: {
+        name: 'XYZ Coffee Shop',
+        email: 'contact@xyzcoffee.com',
+        phone: '+1 (555) 345-6789',
+        address: '789 Coffee Lane, Brew City, BC 90123',
+        status: 'prospect',
+        userId: vickUser.id, // Assign to Vick
+        companyId: company.id,
+      },
+    });
+
+    console.log('Demo customers created');
+  } else {
+    console.log('Customers already exist, skipping demo customer creation');
+  }
 
   // Create cup products for different sizes and quantities
 
