@@ -109,6 +109,7 @@ model Invoice {
   id          String   @id @default(cuid())
   number      String
   amount      Float
+  discount    Float    @default(0) // Discount amount
   status      String   @default("pending") // "pending", "paid", "overdue", "void"
   dueDate     DateTime
   createdAt   DateTime @default(now())
